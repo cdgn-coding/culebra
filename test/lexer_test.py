@@ -1,6 +1,7 @@
 from unittest import TestCase
 from src.lexer import Lexer
 from src.token import Token, TokenType
+
 class TestLexer(TestCase):
     def test_illegal_character(self):
         code = "$@?"
@@ -18,7 +19,7 @@ class TestLexer(TestCase):
         code = "123"
         lexer = Lexer(code)
         tokens = lexer.tokenize()
-        print(tokens)
+        
         expected = [
             Token(TokenType.NUMBER, "123"),
             Token(TokenType.EOF, "")
@@ -108,8 +109,8 @@ class TestLexer(TestCase):
             Token(TokenType.FLOAT, "3.14"),
             Token(TokenType.EOF, "")
         ]
-        print('has tokens', tokens)
-        print('has expected', expected)
+        
+        
         self.assertEqual(tokens, expected)
 
     def test_keyword_if_else(self):
@@ -125,3 +126,124 @@ class TestLexer(TestCase):
         ]
 
         self.assertEqual(tokens, expected)
+
+    def test_conditional_statement(self):
+        source = """
+if x > 10:
+\tprint("x es mayor que 10")
+elif x == 10:
+\tprint("x es igual a 10")
+else:
+\tprint("x es menor que 10")"""
+        
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.IF, "if"),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.GREATER, ">"),
+            Token(TokenType.NUMBER, "10"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.PRINT, "print"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.STRING, '"x es mayor que 10"'),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.INDENT, 0),
+            Token(TokenType.ELSEIF, "elif"),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.EQUAL, "=="),
+            Token(TokenType.NUMBER, "10"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.PRINT, "print"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.STRING, '"x es igual a 10"'),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.INDENT, 0),
+            Token(TokenType.ELSE, "else"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.PRINT, "print"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.STRING, '"x es menor que 10"'),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.INDENT, 0),
+            Token(TokenType.EOF, ""),
+        ]
+
+        
+        
+
+        self.assertEqual(expected, tokens)
+
+    def test_indentation(self):
+        source = """
+def test():
+\tx = 1
+\ty = 2
+\tz = 3
+"""
+        
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.FUNCTION_DEFINITION, "def"),
+            Token(TokenType.IDENTIFIER, "test"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.IDENTIFIER, "y"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "2"),
+            Token(TokenType.IDENTIFIER, "z"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "3"),
+            Token(TokenType.INDENT, 0),
+            Token(TokenType.EOF, ""),
+        ]        
+        
+        self.assertEqual(expected, tokens)
+
+    def test_space_indentation(self):
+        source = """
+def test():
+    x = 1
+        y = 2
+    z = 3
+"""
+        
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.FUNCTION_DEFINITION, "def"),
+            Token(TokenType.IDENTIFIER, "test"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "y"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "2"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "z"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "3"),
+            Token(TokenType.INDENT, 0),
+            Token(TokenType.EOF, ""),
+        ]
+        
+        
+        
+        self.assertEqual(expected, tokens)

@@ -4,7 +4,8 @@ from src.token import Token, TokenType
 
 class Lexer:
     def __init__(self, text: str):
-        self.text = text
+        self.text = text.strip()
+        self.current_indent = 0
 
     def tokenize(self) -> List[Token]:
         tokens = []
@@ -12,6 +13,21 @@ class Lexer:
         while i < len(self.text):
             chunk = self.text[i:]
             is_legal = False
+
+            if self.text[i] == '\n':
+                indent = 0
+                i += 1
+                while i < len(self.text):
+                    match = IndentRegex.match(self.text[i:])
+                    if not match: break
+                    indent += 1
+                    i += match.end()
+
+                if indent != self.current_indent:
+                    tokens.append(Token(TokenType.INDENT, indent))
+                    self.current_indent = indent
+
+                continue
 
             for token_type, regex in TokenRegex.items():
                 match = regex.match(chunk)
@@ -30,9 +46,14 @@ class Lexer:
                 tokens.append(token)
                 i += 1
 
+        if self.current_indent > 0:
+            tokens.append(Token(TokenType.INDENT, 0))
+
         tokens.append(Token(TokenType.EOF, ""))
 
         return tokens
+
+IndentRegex = re.compile(r"^(\t|    )")
 
 TokenRegex = {
     TokenType.WHITESPACE: re.compile(r"^[\s]+"),
@@ -47,7 +68,7 @@ TokenRegex = {
     TokenType.CONTINUE: re.compile(r"^continue"),
     TokenType.PRINT: re.compile(r"^print"),
     TokenType.PRINTLN: re.compile(r"^println"),
-
+    TokenType.FUNCTION_DEFINITION: re.compile(r"^def"),
     # Single-character tokens
     TokenType.LPAREN: re.compile(r"^\("),
     TokenType.RPAREN: re.compile(r"^\)"), 
@@ -80,7 +101,5 @@ TokenRegex = {
     TokenType.IDENTIFIER: re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*"),
     TokenType.STRING: re.compile(r'^"[^"]*"'),
 
-    # Indentation
-    TokenType.INDENT: re.compile(r"^(\n+)"),
-    TokenType.DEDENT: re.compile(r"^(\n+)"),
+    TokenType.COLON: re.compile(r"^:"),
 }

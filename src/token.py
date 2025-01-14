@@ -6,6 +6,7 @@ class TokenType(Enum):
     # Single-character tokens
     ASSIGN  = auto()
     COMMA   = auto()
+    COLON   = auto()
     LPAREN  = auto()
     RPAREN  = auto()
     LBRACE  = auto()
@@ -15,7 +16,6 @@ class TokenType(Enum):
 
     # Indentation
     INDENT   = auto()
-    DEDENT   = auto()
 
     # Literals
     IDENTIFIER = auto()
@@ -29,7 +29,7 @@ class TokenType(Enum):
     SET        = auto()
 
     # Keywords
-    FUNCTION = auto()
+    FUNCTION_DEFINITION = auto()
     IF       = auto()
     ELSE     = auto()
     RETURN   = auto()
