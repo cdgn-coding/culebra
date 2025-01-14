@@ -17,9 +17,10 @@ class Lexer:
                 match = regex.match(chunk)
                 if match:
                     value = match.group(0)
-                    token = Token(token_type, value)
-                    tokens.append(token)
-                    i += len(value) + 1
+                    if token_type != TokenType.WHITESPACE:
+                        token = Token(token_type, value)
+                        tokens.append(token)
+                    i += len(value)
                     is_legal = True
                     break
 
@@ -34,5 +35,52 @@ class Lexer:
         return tokens
 
 TokenRegex = {
+    TokenType.WHITESPACE: re.compile(r"^[\s]+"),
+
+    # Keywords
+    TokenType.IF: re.compile(r"^if"),
+    TokenType.ELSE: re.compile(r"^else"),
+    TokenType.ELSEIF: re.compile(r"^elif"),
+    TokenType.WHILE: re.compile(r"^while"),
+    TokenType.FOR: re.compile(r"^for"),
+    TokenType.BREAK: re.compile(r"^break"),
+    TokenType.CONTINUE: re.compile(r"^continue"),
+    TokenType.PRINT: re.compile(r"^print"),
+    TokenType.PRINTLN: re.compile(r"^println"),
+
+    # Single-character tokens
+    TokenType.LPAREN: re.compile(r"^\("),
+    TokenType.RPAREN: re.compile(r"^\)"), 
+    TokenType.LBRACE: re.compile(r"^{"),
+    TokenType.RBRACE: re.compile(r"^}"),
+    TokenType.LBRACKET: re.compile(r"^\["),
+    TokenType.RBRACKET: re.compile(r"^\]"),
+    TokenType.COMMA: re.compile(r"^,"),
+
+    # Assignment after equals
+    TokenType.EQUAL: re.compile(r"^=="),
+    TokenType.ASSIGN: re.compile(r"^="),
+
+    # Operators
+    TokenType.PLUS: re.compile(r"^\+"),
+    TokenType.MINUS: re.compile(r"^-"),
+    TokenType.MUL: re.compile(r"^\*"),
+    TokenType.DIV: re.compile(r"^/"),
+
+    # Comparison operators
+    TokenType.NOT_EQUAL: re.compile(r"^!="),
+    TokenType.LESS_EQ: re.compile(r"^<="),
+    TokenType.LESS: re.compile(r"^<"),
+    TokenType.GREATER_EQ: re.compile(r"^>="),
+    TokenType.GREATER: re.compile(r"^>"),
+
+    # Literals
+    TokenType.FLOAT: re.compile(r"^[0-9]+\.[0-9]+"),
     TokenType.NUMBER: re.compile(r"^([0-9]+)"),
+    TokenType.IDENTIFIER: re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*"),
+    TokenType.STRING: re.compile(r'^"[^"]*"'),
+
+    # Indentation
+    TokenType.INDENT: re.compile(r"^(\n+)"),
+    TokenType.DEDENT: re.compile(r"^(\n+)"),
 }

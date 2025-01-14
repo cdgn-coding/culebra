@@ -13,6 +13,10 @@ class TokenType(Enum):
     LBRACKET = auto()
     RBRACKET = auto()
 
+    # Indentation
+    INDENT   = auto()
+    DEDENT   = auto()
+
     # Literals
     IDENTIFIER = auto()
     NUMBER     = auto()
@@ -59,12 +63,13 @@ class TokenType(Enum):
     # Expressions
     FUNCTION_CALL = auto()
 
-
     # End of file
     EOF      = auto()
 
     # Errors
     ILLEGAL_CHARACTER = auto()
+
+    WHITESPACE = auto()
 
 class Token:
     type: TokenType

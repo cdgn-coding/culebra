@@ -24,3 +24,104 @@ class TestLexer(TestCase):
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
+
+    def test_empty_input(self):
+        lexer = Lexer("")
+        tokens = lexer.tokenize()
+        expected = [
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_single_char_tokens(self):
+        input_code = "(){}[],"
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.LBRACE, "{"),
+            Token(TokenType.RBRACE, "}"),
+            Token(TokenType.LBRACKET, "["),
+            Token(TokenType.RBRACKET, "]"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.EOF, "")
+        ]
+
+        self.assertEqual(tokens, expected)
+
+    def test_assignment(self):
+        input_code = "x = 10"
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "10"),
+            Token(TokenType.EOF, "")
+        ]
+
+        self.assertEqual(tokens, expected)
+
+    def test_arithmetic_operators(self):
+        input_code = "+-*/"
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.PLUS, "+"),
+            Token(TokenType.MINUS, "-"),
+            Token(TokenType.MUL, "*"),
+            Token(TokenType.DIV, "/"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_comparison_operators(self):
+        input_code = "== != < > <= >="
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.EQUAL, "=="),
+            Token(TokenType.NOT_EQUAL, "!="),
+            Token(TokenType.LESS, "<"),
+            Token(TokenType.GREATER, ">"),
+            Token(TokenType.LESS_EQ, "<="),
+            Token(TokenType.GREATER_EQ, ">="),
+            Token(TokenType.EOF, "")
+        ]
+
+        self.assertEqual(tokens, expected)
+
+    def test_literals(self):
+        input_code = '123 someIdentifier "string literal" 3.14'
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.NUMBER, "123"),
+            Token(TokenType.IDENTIFIER, "someIdentifier"),
+            Token(TokenType.STRING, '"string literal"'),
+            Token(TokenType.FLOAT, "3.14"),
+            Token(TokenType.EOF, "")
+        ]
+        print('has tokens', tokens)
+        print('has expected', expected)
+        self.assertEqual(tokens, expected)
+
+    def test_keyword_if_else(self):
+        input_code = "if else elif"
+        lexer = Lexer(input_code)
+        tokens = lexer.tokenize()
+
+        expected = [
+            Token(TokenType.IF, "if"),
+            Token(TokenType.ELSE, "else"),
+            Token(TokenType.ELSEIF, "elif"),
+            Token(TokenType.EOF, "")
+        ]
+
+        self.assertEqual(tokens, expected)
