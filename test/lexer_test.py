@@ -247,3 +247,20 @@ def test():
         
         
         self.assertEqual(expected, tokens)
+
+    def test_line_comment(self):
+        source = "x = 10  # This is a comment\ny = 20"
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "10"),
+            Token(TokenType.IDENTIFIER, "y"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "20"),
+            Token(TokenType.EOF, "")
+        ]
+        
+        self.assertEqual(tokens, expected)

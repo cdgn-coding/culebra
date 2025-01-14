@@ -33,7 +33,7 @@ class Lexer:
                 match = regex.match(chunk)
                 if match:
                     value = match.group(0)
-                    if token_type != TokenType.WHITESPACE:
+                    if token_type not in [TokenType.WHITESPACE, TokenType.LINE_COMMENT]:
                         token = Token(token_type, value)
                         tokens.append(token)
                     i += len(value)
@@ -57,6 +57,8 @@ IndentRegex = re.compile(r"^(\t|    )")
 
 TokenRegex = {
     TokenType.WHITESPACE: re.compile(r"^[\s]+"),
+    # Matches line comments, everything except newlines
+    TokenType.LINE_COMMENT: re.compile(r"^#[^\n]*"),
 
     # Keywords
     TokenType.IF: re.compile(r"^if"),
@@ -69,6 +71,8 @@ TokenRegex = {
     TokenType.PRINT: re.compile(r"^print"),
     TokenType.PRINTLN: re.compile(r"^println"),
     TokenType.FUNCTION_DEFINITION: re.compile(r"^def"),
+
+    
     # Single-character tokens
     TokenType.LPAREN: re.compile(r"^\("),
     TokenType.RPAREN: re.compile(r"^\)"), 

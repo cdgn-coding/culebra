@@ -71,6 +71,8 @@ class TokenType(Enum):
 
     WHITESPACE = auto()
 
+    LINE_COMMENT = auto()
+
 class Token:
     type: TokenType
     literal: str
