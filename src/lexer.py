@@ -68,8 +68,7 @@ TokenRegex = {
     TokenType.FOR: re.compile(r"^for"),
     TokenType.BREAK: re.compile(r"^break"),
     TokenType.CONTINUE: re.compile(r"^continue"),
-    TokenType.PRINT: re.compile(r"^print"),
-    TokenType.PRINTLN: re.compile(r"^println"),
+    TokenType.RETURN: re.compile(r"^return"),
     TokenType.FUNCTION_DEFINITION: re.compile(r"^def"),
 
     

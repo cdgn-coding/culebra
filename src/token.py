@@ -23,13 +23,7 @@ class TokenType(Enum):
     STRING     = auto()
     FLOAT      = auto()
 
-    # Data Structures
-    ARRAY      = auto()
-    MAP        = auto()
-    SET        = auto()
-
     # Keywords
-    FUNCTION_DEFINITION = auto()
     IF       = auto()
     ELSE     = auto()
     RETURN   = auto()
@@ -38,8 +32,7 @@ class TokenType(Enum):
     FOR      = auto()
     BREAK    = auto()
     CONTINUE = auto()
-    PRINT    = auto()
-    PRINTLN  = auto()
+    FUNCTION_DEFINITION   = auto()
 
     # Operators
     PLUS     = auto()
