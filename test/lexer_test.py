@@ -343,3 +343,12 @@ def test():
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
+
+    def test_eof(self):
+        source = ""
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        expected = [
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
