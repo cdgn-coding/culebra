@@ -71,7 +71,6 @@ TokenRegex = {
     TokenType.RETURN: re.compile(r"^return"),
     TokenType.FUNCTION_DEFINITION: re.compile(r"^def"),
     TokenType.BOOLEAN: re.compile(r"^(true|false)"),
-
     
     # Single-character tokens
     TokenType.LPAREN: re.compile(r"^\("),
@@ -82,6 +81,7 @@ TokenRegex = {
     TokenType.RBRACKET: re.compile(r"^\]"),
     TokenType.COMMA: re.compile(r"^,"),
     TokenType.SEMICOLON: re.compile(r"^;"),
+    TokenType.COLON: re.compile(r"^:"),
 
     # Assignment after equals
     TokenType.EQUAL: re.compile(r"^=="),
@@ -101,9 +101,9 @@ TokenRegex = {
     TokenType.GREATER: re.compile(r"^>"),
 
     # Literals
+    TokenType.INVALID_IDENTIFIER: re.compile(r"^[0-9]+[a-zA-Z_][a-zA-Z0-9_]*"),
     TokenType.FLOAT: re.compile(r"^[0-9]+\.[0-9]+"),
     TokenType.NUMBER: re.compile(r"^([0-9]+)"),
     TokenType.IDENTIFIER: re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*"),
     TokenType.STRING: re.compile(r'^"""[\s\S]*?"""|"[^"]*"'),
-    TokenType.COLON: re.compile(r"^:"),
 }

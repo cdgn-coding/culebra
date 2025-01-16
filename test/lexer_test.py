@@ -352,3 +352,18 @@ def test():
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
+
+    def test_identifier_patterns(self):
+        source = "variable123 _private num1 1invalid my_var_2"
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.IDENTIFIER, "variable123"),
+            Token(TokenType.IDENTIFIER, "_private"),
+            Token(TokenType.IDENTIFIER, "num1"),
+            Token(TokenType.INVALID_IDENTIFIER, "1invalid"),
+            Token(TokenType.IDENTIFIER, "my_var_2"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)

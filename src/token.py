@@ -63,7 +63,7 @@ class TokenType(Enum):
 
     # Errors
     ILLEGAL_CHARACTER = auto()
-
+    INVALID_IDENTIFIER = auto()
     WHITESPACE = auto()
 
     LINE_COMMENT = auto()
