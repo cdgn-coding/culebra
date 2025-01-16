@@ -13,6 +13,7 @@ class TokenType(Enum):
     RBRACE  = auto()
     LBRACKET = auto()
     RBRACKET = auto()
+    SEMICOLON = auto()
 
     # Indentation
     INDENT   = auto()
@@ -22,12 +23,13 @@ class TokenType(Enum):
     NUMBER     = auto()
     STRING     = auto()
     FLOAT      = auto()
+    BOOLEAN    = auto()
 
     # Keywords
     IF       = auto()
     ELSE     = auto()
     RETURN   = auto()
-    ELSEIF   = auto()
+    ELIF   = auto()
     WHILE    = auto()
     FOR      = auto()
     BREAK    = auto()

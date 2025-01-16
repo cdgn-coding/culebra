@@ -121,7 +121,7 @@ class TestLexer(TestCase):
         expected = [
             Token(TokenType.IF, "if"),
             Token(TokenType.ELSE, "else"),
-            Token(TokenType.ELSEIF, "elif"),
+            Token(TokenType.ELIF, "elif"),
             Token(TokenType.EOF, "")
         ]
 
@@ -151,7 +151,7 @@ else:
             Token(TokenType.STRING, '"x es mayor que 10"'),
             Token(TokenType.RPAREN, ")"),
             Token(TokenType.INDENT, 0),
-            Token(TokenType.ELSEIF, "elif"),
+            Token(TokenType.ELIF, "elif"),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.EQUAL, "=="),
             Token(TokenType.NUMBER, "10"),
@@ -263,4 +263,83 @@ def test():
             Token(TokenType.EOF, "")
         ]
         
+        self.assertEqual(tokens, expected)
+
+    def test_multiline_string(self):
+        source = '"""This is a\nmultiline string"""\nx = 1'
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.STRING, '"""This is a\nmultiline string"""'),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.EOF, "")
+        ]
+
+        print(tokens)
+        print(expected)
+        self.assertEqual(tokens, expected)
+
+    def test_boolean_literals(self):
+        source = "true false"
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.BOOLEAN, "true"),
+            Token(TokenType.BOOLEAN, "false"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_for_loop_syntax(self):
+        source = "for i = 0; i < 10; i = i + 1:"
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.FOR, "for"),
+            Token(TokenType.IDENTIFIER, "i"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.NUMBER, "0"),
+            Token(TokenType.SEMICOLON, ";"),
+            Token(TokenType.IDENTIFIER, "i"),
+            Token(TokenType.LESS, "<"),
+            Token(TokenType.NUMBER, "10"),
+            Token(TokenType.SEMICOLON, ";"),
+            Token(TokenType.IDENTIFIER, "i"),
+            Token(TokenType.ASSIGN, "="),
+            Token(TokenType.IDENTIFIER, "i"),
+            Token(TokenType.PLUS, "+"),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_mixed_data_types(self):
+        source = '[1, "text", 3.14, true, {1, 2}]'
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        
+        expected = [
+            Token(TokenType.LBRACKET, "["),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.STRING, '"text"'),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.FLOAT, "3.14"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.BOOLEAN, "true"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.LBRACE, "{"),
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.COMMA, ","),
+            Token(TokenType.NUMBER, "2"),
+            Token(TokenType.RBRACE, "}"),
+            Token(TokenType.RBRACKET, "]"),
+            Token(TokenType.EOF, "")
+        ]
         self.assertEqual(tokens, expected)
