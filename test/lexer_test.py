@@ -367,3 +367,25 @@ def test():
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
+
+    def test_longest_possible_token_for(self):
+        source = "for_identifier_not_keyworkd"
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.IDENTIFIER, "for_identifier_not_keyworkd"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_longest_possible_token_if(self):
+        source = "if_identifier_not_keyworkd"
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.IDENTIFIER, "if_identifier_not_keyworkd"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
