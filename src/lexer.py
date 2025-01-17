@@ -13,7 +13,6 @@ class Lexer:
         tokens = []
         i = 0
         while i < len(text):
-            print(f"chunk: {text[i:]}")
             chunk = text[i:]
             is_legal = False
 
@@ -34,7 +33,6 @@ class Lexer:
 
             for token_type, regex in TokenRegex.items():
                 match = regex.match(chunk)
-                print(f"{token_type}: {match}")
                 if match:
                     value = match.group(0)
                     if token_type not in [TokenType.WHITESPACE, TokenType.LINE_COMMENT]:
@@ -66,15 +64,15 @@ TokenRegex = {
 
     # Keywords
     TokenType.IF: re.compile(r"^if(?=\s|$)"),
-    TokenType.ELSE: re.compile(r"^else(?=\s|$)"),
+    TokenType.ELSE: re.compile(r"^else(?=[\s:]|$)"),
     TokenType.ELIF: re.compile(r"^elif(?=\s|$)"),
     TokenType.WHILE: re.compile(r"^while(?=\s|$)"),
     TokenType.FOR: re.compile(r"^for(?=\s|$)"),
     TokenType.BREAK: re.compile(r"^break(?=\s|$)"),
     TokenType.CONTINUE: re.compile(r"^continue(?=\s|$)"),
     TokenType.RETURN: re.compile(r"^return(?=\s|$)"),
-    TokenType.FUNCTION_DEFINITION: re.compile(r"^(?=[\s\(]|$)"),
-    TokenType.BOOLEAN: re.compile(r"^(true|false)(?=\s|$)"),
+    TokenType.FUNCTION_DEFINITION: re.compile(r"^def(?=[\s\(]|$)"),
+    TokenType.BOOLEAN: re.compile(r"^(true|false)(?=[\s,:]|$)"),
     
     # Single-character tokens
     TokenType.LPAREN: re.compile(r"^\("),
