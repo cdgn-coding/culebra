@@ -7,29 +7,27 @@ from typing import NoReturn
 from src.token import Token, TokenType
 
 class Lexer:
-    def __init__(self, text: str):
-        self.text = text.strip()
-        self.current_indent = 0
-
-    def tokenize(self) -> List[Token]:
+    def tokenize(self, text: str) -> List[Token]:
+        text = text.strip()
+        current_indent = 0
         tokens = []
         i = 0
-        while i < len(self.text):
-            chunk = self.text[i:]
+        while i < len(text):
+            chunk = text[i:]
             is_legal = False
 
-            if self.text[i] == '\n':
+            if text[i] == '\n':
                 indent = 0
                 i += 1
-                while i < len(self.text):
-                    match = IndentRegex.match(self.text[i:])
+                while i < len(text):
+                    match = IndentRegex.match(text[i:])
                     if not match: break
                     indent += 1
                     i += match.end()
 
-                if indent != self.current_indent:
+                if indent != current_indent:
                     tokens.append(Token(TokenType.INDENT, indent))
-                    self.current_indent = indent
+                    current_indent = indent
 
                 continue
 
@@ -50,7 +48,7 @@ class Lexer:
                 tokens.append(token)
                 i += 1
 
-        if self.current_indent > 0:
+        if current_indent > 0:
             tokens.append(Token(TokenType.INDENT, 0))
 
         tokens.append(Token(TokenType.EOF, ""))

@@ -5,8 +5,8 @@ from src.token import Token, TokenType
 class TestLexer(TestCase):
     def test_illegal_character(self):
         code = "$@?"
-        lexer = Lexer(code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(code)
         expected: List[Token] = [
             Token(TokenType.ILLEGAL_CHARACTER, "$"),
             Token(TokenType.ILLEGAL_CHARACTER, "@"),
@@ -17,8 +17,8 @@ class TestLexer(TestCase):
 
     def test_number(self):
         code = "123"
-        lexer = Lexer(code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(code)
         
         expected = [
             Token(TokenType.NUMBER, "123"),
@@ -27,8 +27,8 @@ class TestLexer(TestCase):
         self.assertEqual(tokens, expected)
 
     def test_empty_input(self):
-        lexer = Lexer("")
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize("")
         expected = [
             Token(TokenType.EOF, "")
         ]
@@ -36,8 +36,8 @@ class TestLexer(TestCase):
 
     def test_single_char_tokens(self):
         input_code = "(){}[],"
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.LPAREN, "("),
@@ -54,8 +54,8 @@ class TestLexer(TestCase):
 
     def test_assignment(self):
         input_code = "x = 10"
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.IDENTIFIER, "x"),
@@ -68,8 +68,8 @@ class TestLexer(TestCase):
 
     def test_arithmetic_operators(self):
         input_code = "+-*/"
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.PLUS, "+"),
@@ -82,8 +82,8 @@ class TestLexer(TestCase):
 
     def test_comparison_operators(self):
         input_code = "== != < > <= >="
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.EQUAL, "=="),
@@ -99,8 +99,8 @@ class TestLexer(TestCase):
 
     def test_literals(self):
         input_code = '123 someIdentifier "string literal" 3.14'
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.NUMBER, "123"),
@@ -115,8 +115,8 @@ class TestLexer(TestCase):
 
     def test_keyword_if_else(self):
         input_code = "if else elif"
-        lexer = Lexer(input_code)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
 
         expected = [
             Token(TokenType.IF, "if"),
@@ -136,8 +136,8 @@ elif x == 10:
 else:
 \tprint("x es menor que 10")"""
         
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.IF, "if"),
@@ -186,8 +186,8 @@ def test():
 \tz = 3
 """
         
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.FUNCTION_DEFINITION, "def"),
@@ -219,8 +219,8 @@ def test():
     z = 3
 """
         
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.FUNCTION_DEFINITION, "def"),
@@ -250,8 +250,8 @@ def test():
 
     def test_line_comment(self):
         source = "x = 10  # This is a comment\ny = 20"
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.IDENTIFIER, "x"),
@@ -267,8 +267,8 @@ def test():
 
     def test_multiline_string(self):
         source = '"""This is a\nmultiline string"""\nx = 1'
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.STRING, '"""This is a\nmultiline string"""'),
@@ -284,8 +284,8 @@ def test():
 
     def test_boolean_literals(self):
         source = "true false"
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.BOOLEAN, "true"),
@@ -296,8 +296,8 @@ def test():
 
     def test_for_loop_syntax(self):
         source = "for i = 0; i < 10; i = i + 1:"
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.FOR, "for"),
@@ -321,8 +321,8 @@ def test():
 
     def test_mixed_data_types(self):
         source = '[1, "text", 3.14, true, {1, 2}]'
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.LBRACKET, "["),
@@ -346,8 +346,8 @@ def test():
 
     def test_eof(self):
         source = ""
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         expected = [
             Token(TokenType.EOF, "")
         ]
@@ -355,8 +355,8 @@ def test():
 
     def test_identifier_patterns(self):
         source = "variable123 _private num1 1invalid my_var_2"
-        lexer = Lexer(source)
-        tokens = lexer.tokenize()
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
         
         expected = [
             Token(TokenType.IDENTIFIER, "variable123"),
