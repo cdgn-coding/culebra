@@ -7,25 +7,35 @@ class ASTNode(ABC):
         pass
 
     @abstractmethod
+    def token_type(self) -> str:
+        pass
+
+    @abstractmethod
     def __repr__(self) -> str:
         pass
 
     def __str__(self) -> str:
         return self.__repr__()
 
-class Statement(ASTNode):
+class Statement(ASTNode, ABC):
     def __init__(self, token: Token):
         self.token = token
 
     def token_literal(self) -> str:
         return self.token.literal
 
-class Expression(ASTNode):
+    def token_type(self) -> str:
+        return str(self.token.type)
+
+class Expression(ASTNode, ABC):
     def __init__(self, token: Token):
         self.token = token
 
     def token_literal(self) -> str:
         return self.token.literal
+
+    def token_type(self) -> str:
+        return str(self.token.type)
 
 class Program(ASTNode):
     def __init__(self, statements: List[Statement]):
@@ -36,6 +46,9 @@ class Program(ASTNode):
             return self.statements[0].token_literal()
         return ""
 
+    def token_type(self) -> str:
+        return ''
+
     def __repr__(self) -> str:
         return "\n".join([str(stmt) for stmt in self.statements])
 
@@ -45,7 +58,7 @@ class Identifier(Expression):
         self.value = value
 
     def __repr__(self) -> str:
-        return self.value
+        return f"{self.token_type()} {self.value}"
 
 
 class Assignment(Statement):
@@ -58,5 +71,36 @@ class Assignment(Statement):
         return self.token.literal
 
     def __repr__(self) -> str:
-        return f"{self.token_literal()} = {self.value}"
+        return f"{self.token_type()} {self.identifier} = {self.value}"
 
+class Integer(Expression):
+    def __init__(self, token: Token, value: int):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.value}"
+
+class Float(Expression):
+    def __init__(self, token: Token, value: float):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.value}"
+
+class String(Expression):
+    def __init__(self, token: Token, value: str):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.value}"
+
+class Bool(Expression):
+    def __init__(self, token: Token, value: bool):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.value}"
