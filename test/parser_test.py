@@ -38,3 +38,27 @@ class TestParser(TestCase):
 
         actual_assignment = cast(Assignment, program.statements[0])
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NUMBER 1', repr(actual_assignment))
+
+    def test_parse_literal_expressions_by_data_type(self):
+        sources = [
+            "x = 1",
+            "x = 1.0",
+            'x = "1.0"',
+            "x = true",
+            "x = false",
+        ]
+
+        expected = [
+            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NUMBER 1",
+            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.FLOAT 1.0",
+            'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.STRING "1.0"',
+            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.BOOLEAN True",
+            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.BOOLEAN False",
+        ]
+
+        for source, exp in zip(sources, expected):
+            sequence = Lexer().tokenize(source)
+            parser = Parser(sequence)
+            program = parser.parse()
+            self.assertTrue(isinstance(program, Program))
+            self.assertEqual(exp, repr(program))
