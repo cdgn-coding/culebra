@@ -1,5 +1,6 @@
 from src.lexer import Lexer
-from src.ast import Program, Statement, Assignment, Identifier, Expression, Integer, String, Bool, Float
+from src.ast import Program, Statement, Assignment, Identifier, Expression, Integer, String, Bool, Float, PlusOperation, \
+    MinusOperation
 from typing import Optional
 from src.token import Token, TokenType
 
@@ -104,7 +105,21 @@ class Parser:
         return self._parse_arithmetic_expression()
 
     def _parse_arithmetic_expression(self):
-        return self._parse_term()
+        term = self._parse_term()
+
+        if self._current_token.type == TokenType.PLUS:
+            token = self._current_token
+            self._advance_token()
+            second_term = self._parse_term()
+            return PlusOperation(token, term, second_term)
+
+        if self._current_token.type == TokenType.MINUS:
+            token = self._current_token
+            self._advance_token()
+            second_term = self._parse_term()
+            return MinusOperation(token, term, second_term)
+
+        return term
 
     def _parse_term(self):
         return self._parse_factor()

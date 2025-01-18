@@ -62,3 +62,19 @@ class TestParser(TestCase):
             program = parser.parse()
             self.assertTrue(isinstance(program, Program))
             self.assertEqual(exp, repr(program))
+
+    def test_parse_plus_expression(self):
+        source = "x = 1 + 1"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 1 + TokenType.NUMBER 1', repr(program))
+
+    def test_parse_minus_expression(self):
+        source = "x = 1 - 1"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS TokenType.NUMBER 1 - TokenType.NUMBER 1', repr(program))
