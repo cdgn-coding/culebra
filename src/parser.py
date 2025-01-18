@@ -1,6 +1,6 @@
 from src.lexer import Lexer
 from src.ast import Program, Statement, Assignment, Identifier, Expression, Integer, String, Bool, Float, PlusOperation, \
-    MinusOperation
+    MinusOperation, MultiplicationOperation, DivisionOperation
 from typing import Optional
 from src.token import Token, TokenType
 
@@ -122,7 +122,21 @@ class Parser:
         return term
 
     def _parse_term(self):
-        return self._parse_factor()
+        factor = self._parse_factor()
+
+        if self._current_token.type == TokenType.MUL:
+            token = self._current_token
+            self._advance_token()
+            second_factor = self._parse_factor()
+            return MultiplicationOperation(token, factor, second_factor)
+
+        if self._current_token.type == TokenType.DIV:
+            token = self._current_token
+            self._advance_token()
+            second_factor = self._parse_factor()
+            return DivisionOperation(token, factor, second_factor)
+
+        return factor
 
     def _parse_factor(self):
         if self._current_token.type == TokenType.IDENTIFIER:

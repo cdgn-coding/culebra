@@ -122,3 +122,21 @@ class MinusOperation(Expression):
 
     def __repr__(self) -> str:
         return f"{self.token_type()} {self.left} - {self.right}"
+
+class MultiplicationOperation(Expression):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token)
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.left} * {self.right}"
+
+class DivisionOperation(Expression):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token)
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.left} / {self.right}"
