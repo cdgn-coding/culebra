@@ -3,6 +3,34 @@ from src.ast import Program, Statement, Assignment, Identifier, Expression
 from typing import Optional
 from src.token import Token, TokenType
 
+"""
+program -> statement*
+statement -> assignment | if_statement | while_statement | for_statement | function_def | return_statement | expression
+assignment -> identifier "=" expression
+
+expression -> logical_expr
+logical_expr -> comparison_expr (("and" | "or") comparison_expr)*
+comparison_expr -> arithmetic_expr ((">" | "<" | ">=" | "<=" | "==" | "!=") arithmetic_expr)*
+arithmetic_expr -> term (("+" | "-") term)*
+term -> factor (("*" | "/") factor)*
+factor -> identifier | literal | "(" expression ")" | function_call | array_literal | map_literal | set_literal
+
+literal -> NUMBER | STRING | BOOLEAN | NULL
+array_literal -> "[" (expression ("," expression)*)? "]"
+map_literal -> "{" (STRING ":" expression ("," STRING ":" expression)*)? "}"
+set_literal -> "{" (expression ("," expression)*)? "}"
+
+function_call -> identifier "(" (expression ("," expression)*)? ")"
+function_def -> "def" identifier "(" (identifier ("," identifier)*)? ")" ":" block
+
+if_statement -> "if" expression ":" block ("elif" expression ":" block)* ("else" ":" block)?
+while_statement -> "while" expression ":" block
+for_statement -> "for" assignment ";" expression ";" assignment ":" block
+
+block -> INDENT statement+ DEDENT
+return_statement -> "return" expression?
+"""
+
 class Parser:
     def __init__(self, sequence: list[Token]):
         self.sequence = sequence
@@ -42,7 +70,9 @@ class Parser:
         return Assignment(assignment_token, identifier, value)
     
     def _parse_expression(self) -> Expression:
-        pass
+        while self._current_token() is not None and self._current_token().type != TokenType.NEWLINE:
+            self._advance_token()
+        return None
 
     def _assert_expected_tokens(self, token_types: list[TokenType], token: Token) -> None:
         if token.type not in token_types:

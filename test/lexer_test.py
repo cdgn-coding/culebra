@@ -1,3 +1,4 @@
+from typing import List
 from unittest import TestCase
 from src.lexer import Lexer
 from src.token import Token, TokenType
@@ -11,6 +12,7 @@ class TestLexer(TestCase):
             Token(TokenType.ILLEGAL_CHARACTER, "$"),
             Token(TokenType.ILLEGAL_CHARACTER, "@"),
             Token(TokenType.ILLEGAL_CHARACTER, "?"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -22,6 +24,7 @@ class TestLexer(TestCase):
         
         expected = [
             Token(TokenType.NUMBER, "123"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -30,6 +33,7 @@ class TestLexer(TestCase):
         lexer = Lexer()
         tokens = lexer.tokenize("")
         expected = [
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -47,6 +51,7 @@ class TestLexer(TestCase):
             Token(TokenType.LBRACKET, "["),
             Token(TokenType.RBRACKET, "]"),
             Token(TokenType.COMMA, ","),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -61,6 +66,7 @@ class TestLexer(TestCase):
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "10"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -76,6 +82,7 @@ class TestLexer(TestCase):
             Token(TokenType.MINUS, "-"),
             Token(TokenType.MUL, "*"),
             Token(TokenType.DIV, "/"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -92,6 +99,7 @@ class TestLexer(TestCase):
             Token(TokenType.GREATER, ">"),
             Token(TokenType.LESS_EQ, "<="),
             Token(TokenType.GREATER_EQ, ">="),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -107,6 +115,7 @@ class TestLexer(TestCase):
             Token(TokenType.IDENTIFIER, "someIdentifier"),
             Token(TokenType.STRING, '"string literal"'),
             Token(TokenType.FLOAT, "3.14"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         
@@ -122,6 +131,7 @@ class TestLexer(TestCase):
             Token(TokenType.IF, "if"),
             Token(TokenType.ELSE, "else"),
             Token(TokenType.ELIF, "elif"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -152,7 +162,7 @@ else:
             Token(TokenType.STRING, '"x es mayor que 10"'),
             Token(TokenType.RPAREN, ")"),
             Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 0),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.ELIF, "elif"),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.EQUAL, "=="),
@@ -165,7 +175,7 @@ else:
             Token(TokenType.STRING, '"x es igual a 10"'),
             Token(TokenType.RPAREN, ")"),
             Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 0),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.ELSE, "else"),
             Token(TokenType.COLON, ":"),
             Token(TokenType.NEWLINE, "\n"),
@@ -174,11 +184,12 @@ else:
             Token(TokenType.LPAREN, "("),
             Token(TokenType.STRING, '"x es menor que 10"'),
             Token(TokenType.RPAREN, ")"),
-            Token(TokenType.INDENT, 0),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.EOF, ""),
         ]
 
-        self.assertEqual(expected, tokens)
+        self.assertEqual(tokens, expected)
 
     def test_indentation(self):
         source = """
@@ -192,7 +203,6 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.FUNCTION_DEFINITION, "def"),
             Token(TokenType.IDENTIFIER, "test"),
             Token(TokenType.LPAREN, "("),
@@ -212,9 +222,57 @@ def test():
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "3"),
             Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 0),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.EOF, ""),
         ]
+        self.assertEqual(tokens, expected)
+
+    def test_nested_indentation(self):
+        source = """
+def test():
+\tif x > 0:
+\t\tprint("positive")
+\telse:
+\t\tprint("negative")
+"""
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.FUNCTION_DEFINITION, "def"),
+            Token(TokenType.IDENTIFIER, "test"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IF, "if"),
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.GREATER, ">"),
+            Token(TokenType.NUMBER, "0"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "print"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.STRING, '"positive"'),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.ELSE, "else"),
+            Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "print"),
+            Token(TokenType.LPAREN, "("),
+            Token(TokenType.STRING, '"negative"'),
+            Token(TokenType.RPAREN, ")"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.EOF, ""),
+        ]
+        self.assertEqual(tokens, expected)
 
     def test_space_indentation(self):
         source = """
@@ -228,7 +286,6 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.FUNCTION_DEFINITION, "def"),
             Token(TokenType.IDENTIFIER, "test"),
             Token(TokenType.LPAREN, "("),
@@ -245,14 +302,15 @@ def test():
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "2"),
             Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.IDENTIFIER, "z"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "3"),
             Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 0),
+            Token(TokenType.DEDENT, None),
             Token(TokenType.EOF, ""),
         ]
+        self.assertEqual(tokens, expected)
 
     def test_line_comment(self):
         source = "x = 10  # This is a comment\ny = 20"
@@ -267,6 +325,7 @@ def test():
             Token(TokenType.IDENTIFIER, "y"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "20"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -283,6 +342,7 @@ def test():
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "1"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
 
@@ -298,6 +358,7 @@ def test():
         expected = [
             Token(TokenType.BOOLEAN, "true"),
             Token(TokenType.BOOLEAN, "false"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -323,6 +384,7 @@ def test():
             Token(TokenType.PLUS, "+"),
             Token(TokenType.NUMBER, "1"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -348,6 +410,7 @@ def test():
             Token(TokenType.NUMBER, "2"),
             Token(TokenType.RBRACE, "}"),
             Token(TokenType.RBRACKET, "]"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -357,6 +420,7 @@ def test():
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -372,6 +436,7 @@ def test():
             Token(TokenType.IDENTIFIER, "num1"),
             Token(TokenType.INVALID_IDENTIFIER, "1invalid"),
             Token(TokenType.IDENTIFIER, "my_var_2"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -383,6 +448,7 @@ def test():
         
         expected = [
             Token(TokenType.IDENTIFIER, "for_identifier_not_keyworkd"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
@@ -394,6 +460,106 @@ def test():
         
         expected = [
             Token(TokenType.IDENTIFIER, "if_identifier_not_keyworkd"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_simple_indentation(self):
+        source = """
+x
+    y
+z
+"""
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        expected = [
+            Token(TokenType.IDENTIFIER, "x"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "y"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.IDENTIFIER, "z"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_multiple_dedents(self):
+        source = """
+x1
+    x2
+        x3
+    x4
+x5
+"""
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        expected = [
+            Token(TokenType.IDENTIFIER, "x1"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "x2"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "x3"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.IDENTIFIER, "x4"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.IDENTIFIER, "x5"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_end_of_file_dedents(self):
+        source = """
+x1
+    x2
+        x3
+"""
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        expected = [
+            Token(TokenType.IDENTIFIER, "x1"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "x2"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "x3"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_multiple_explicit_dedents(self):
+        source = """
+x1
+    x2
+        x3
+x4
+"""
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        expected = [
+            Token(TokenType.IDENTIFIER, "x1"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 1),
+            Token(TokenType.IDENTIFIER, "x2"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.INDENT, 2),
+            Token(TokenType.IDENTIFIER, "x3"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.DEDENT, None),
+            Token(TokenType.IDENTIFIER, "x4"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)

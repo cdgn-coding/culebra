@@ -9,7 +9,7 @@ from src.token import Token, TokenType
 class Lexer:
     def tokenize(self, text: str) -> List[Token]:
         text = text.strip()
-        current_indent = 0
+        indent_stack = [0]  # Keep track of indent levels
         tokens = []
         i = 0
         while i < len(text):
@@ -26,9 +26,19 @@ class Lexer:
                     indent += 1
                     i += match.end()
 
-                if indent != current_indent:
+                current_indent = indent_stack[-1]
+                if indent > current_indent:
+                    # Increasing indent
                     tokens.append(Token(TokenType.INDENT, indent))
-                    current_indent = indent
+                    indent_stack.append(indent)
+                elif indent < current_indent:
+                    # Decreasing indent - may need multiple DEDENT tokens
+                    while indent < indent_stack[-1]:
+                        indent_stack.pop()
+                        tokens.append(Token(TokenType.DEDENT, None))
+                    ## TODO: esto esta mal
+                    if indent != indent_stack[-1]:
+                        raise IndentationError(f"Unindent does not match any outer indentation level")
 
                 continue
 
@@ -49,11 +59,15 @@ class Lexer:
                 tokens.append(token)
                 i += 1
 
-        if current_indent > 0:
-            tokens.append(Token(TokenType.INDENT, 0))
+        if not tokens or tokens[-1].type != TokenType.NEWLINE:
+            tokens.append(Token(TokenType.NEWLINE, '\n'))
+
+        # Handle any remaining dedents at the end of file
+        while len(indent_stack) > 1:
+            indent_stack.pop()
+            tokens.append(Token(TokenType.DEDENT, None))
 
         tokens.append(Token(TokenType.EOF, ""))
-
         return tokens
 
 IndentRegex = re.compile(r"^(\t|    )")

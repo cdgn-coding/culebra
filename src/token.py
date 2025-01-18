@@ -1,5 +1,6 @@
 from enum import Enum, auto, unique
-from typing import NamedTuple
+from typing import NamedTuple, Optional
+
 
 @unique
 class TokenType(Enum):
@@ -18,6 +19,7 @@ class TokenType(Enum):
 
     # Indentation
     INDENT   = auto()
+    DEDENT = auto()
 
     # Literals
     IDENTIFIER = auto()
@@ -71,9 +73,9 @@ class TokenType(Enum):
 
 class Token:
     type: TokenType
-    literal: str
+    literal: Optional[str]
 
-    def __init__(self, type: TokenType, literal: str):
+    def __init__(self, type: TokenType, literal: Optional[str]):
         self.type = type
         self.literal = literal
 

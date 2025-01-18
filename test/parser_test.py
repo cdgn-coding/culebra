@@ -22,7 +22,6 @@ class TestParser(TestCase):
             
         self.assertEqual(str(context.exception), "Expected any of [<TokenType.ASSIGN: 1>], got TokenType.EOF instead")
 
-    @skip("Not implemented")
     def test_parse_assignment(self):
         source = "x = 1;"
         sequence = Lexer().tokenize(source)
