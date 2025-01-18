@@ -346,8 +346,6 @@ def test():
             Token(TokenType.EOF, "")
         ]
 
-        print(tokens)
-        print(expected)
         self.assertEqual(tokens, expected)
 
     def test_boolean_literals(self):
