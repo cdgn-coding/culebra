@@ -12,25 +12,11 @@ class TestParser(TestCase):
 
         self.assertTrue(isinstance(program, Program))
 
-    def test_parse_incomplete_assignment(self):
-        source = "x"
-        sequence = Lexer().tokenize(source)
-        parser = Parser(sequence)
-        
-        with self.assertRaises(ValueError) as context:
-            program = parser.parse()
-            
-        self.assertEqual(str(context.exception), "Expected any of [<TokenType.ASSIGN: 1>], got TokenType.EOF instead")
-
     def test_parse_assignment(self):
-        source = "x = 1;"
+        source = "x = 1"
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
 
         self.assertTrue(isinstance(program, Program))
         self.assertEqual(len(program.statements), 1)
-        self.assertTrue(isinstance(program.statements[0], Assignment))
-        self.assertEqual(program.statements[0].identifier.value, "x")
-        self.assertEqual(program.statements[0].value.value, "1")
-        

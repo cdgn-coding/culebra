@@ -49,30 +49,29 @@ class Parser:
     def _parse_statement(self) -> Optional[Statement]:
         assert self._current_token() is not None
 
-        if self._current_token().type == TokenType.IDENTIFIER:
-            return self._parse_identifier_statement()
-    
-
-    def _parse_identifier_statement(self) -> Optional[Statement]:
-        assert self._next_token() is not None
-        self._assert_expected_tokens([TokenType.ASSIGN], self._next_token())
-        
-        if self._next_token() == TokenType.ASSIGN:
+        if self._current_token().type == TokenType.IDENTIFIER and self._next_token().type == TokenType.ASSIGN:
             return self._parse_assignment_statement()
         
     def _parse_assignment_statement(self) -> Optional[Assignment]:
+        # Parse identifier of assigment
+        self._assert_expected_tokens([TokenType.IDENTIFIER], self._current_token())
         identifier = Identifier(self._current_token(), self._current_token().literal)
         self._advance_token()
+
+        # Get assigment token
         self._assert_expected_tokens([TokenType.ASSIGN], self._current_token())
         assignment_token = self._current_token()
         self._advance_token()
+
+        # Parse expression to assign
         value = self._parse_expression()
+
         return Assignment(assignment_token, identifier, value)
     
     def _parse_expression(self) -> Expression:
-        while self._current_token() is not None and self._current_token().type != TokenType.NEWLINE:
+        while self._current_token().type != TokenType.NEWLINE:
             self._advance_token()
-        return None
+        pass
 
     def _assert_expected_tokens(self, token_types: list[TokenType], token: Token) -> None:
         if token.type not in token_types:
@@ -86,7 +85,7 @@ class Parser:
             return self.sequence[self.index]
         return None
 
-    def _next_token(self) -> None:
+    def _next_token(self) -> Optional[Token]:
         if self.index + 1 < len(self.sequence):
             return self.sequence[self.index + 1]
         return None
