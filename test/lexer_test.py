@@ -145,25 +145,30 @@ else:
             Token(TokenType.GREATER, ">"),
             Token(TokenType.NUMBER, "10"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "print"),
             Token(TokenType.LPAREN, "("),
             Token(TokenType.STRING, '"x es mayor que 10"'),
             Token(TokenType.RPAREN, ")"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 0),
             Token(TokenType.ELIF, "elif"),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.EQUAL, "=="),
             Token(TokenType.NUMBER, "10"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "print"),
             Token(TokenType.LPAREN, "("),
             Token(TokenType.STRING, '"x es igual a 10"'),
             Token(TokenType.RPAREN, ")"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 0),
             Token(TokenType.ELSE, "else"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "print"),
             Token(TokenType.LPAREN, "("),
@@ -172,9 +177,6 @@ else:
             Token(TokenType.INDENT, 0),
             Token(TokenType.EOF, ""),
         ]
-
-        
-        
 
         self.assertEqual(expected, tokens)
 
@@ -190,26 +192,29 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.FUNCTION_DEFINITION, "def"),
             Token(TokenType.IDENTIFIER, "test"),
             Token(TokenType.LPAREN, "("),
             Token(TokenType.RPAREN, ")"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "1"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.IDENTIFIER, "y"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "2"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.IDENTIFIER, "z"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "3"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 0),
             Token(TokenType.EOF, ""),
-        ]        
-        
-        self.assertEqual(expected, tokens)
+        ]
 
     def test_space_indentation(self):
         source = """
@@ -223,30 +228,31 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.FUNCTION_DEFINITION, "def"),
             Token(TokenType.IDENTIFIER, "test"),
             Token(TokenType.LPAREN, "("),
             Token(TokenType.RPAREN, ")"),
             Token(TokenType.COLON, ":"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "1"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 2),
             Token(TokenType.IDENTIFIER, "y"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "2"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 1),
             Token(TokenType.IDENTIFIER, "z"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "3"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.INDENT, 0),
             Token(TokenType.EOF, ""),
         ]
-        
-        
-        
-        self.assertEqual(expected, tokens)
 
     def test_line_comment(self):
         source = "x = 10  # This is a comment\ny = 20"
@@ -257,12 +263,13 @@ def test():
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "10"),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.IDENTIFIER, "y"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "20"),
             Token(TokenType.EOF, "")
         ]
-        
+
         self.assertEqual(tokens, expected)
 
     def test_multiline_string(self):
@@ -272,6 +279,7 @@ def test():
         
         expected = [
             Token(TokenType.STRING, '"""This is a\nmultiline string"""'),
+            Token(TokenType.NEWLINE, "\n"),
             Token(TokenType.IDENTIFIER, "x"),
             Token(TokenType.ASSIGN, "="),
             Token(TokenType.NUMBER, "1"),

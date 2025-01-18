@@ -48,7 +48,7 @@ class Identifier(Expression):
         return self.value
 
 
-class AssignmentStatement(Statement):
+class Assignment(Statement):
     def __init__(self, token: Token, identifier: Identifier, value: Expression):
         super().__init__(token)
         self.identifier = identifier

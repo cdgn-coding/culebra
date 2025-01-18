@@ -17,6 +17,7 @@ class Lexer:
             is_legal = False
 
             if text[i] == '\n':
+                tokens.append(Token(TokenType.NEWLINE, '\n'))
                 indent = 0
                 i += 1
                 while i < len(text):

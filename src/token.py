@@ -14,6 +14,7 @@ class TokenType(Enum):
     LBRACKET = auto()
     RBRACKET = auto()
     SEMICOLON = auto()
+    NEWLINE = auto()
 
     # Indentation
     INDENT   = auto()
