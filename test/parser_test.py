@@ -87,10 +87,29 @@ class TestParser(TestCase):
         self.assertTrue(isinstance(program, Program))
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MUL TokenType.NUMBER 1 * TokenType.NUMBER 2', repr(program))
 
-    def test_parse_divison_expressions(self):
+    def test_parse_division_expressions(self):
         source = "x = 1 / 2"
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.DIV TokenType.NUMBER 1 / TokenType.NUMBER 2', repr(program))
+
+    def test_parse_recursive_arithmetic(self):
+        source = "x = 2 + 3 * 2"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 2 + TokenType.MUL TokenType.NUMBER 3 * TokenType.NUMBER 2', repr(program))
+
+    def test_parse_multiple_recursive_arithmetic(self):
+        source = "x = 2 + 3 * 2\ny = 1.0 + 1.0 / 2.0"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual("\n".join([
+            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 2 + TokenType.MUL TokenType.NUMBER 3 * TokenType.NUMBER 2",
+            "TokenType.ASSIGN TokenType.IDENTIFIER y = TokenType.PLUS TokenType.FLOAT 1.0 + TokenType.DIV TokenType.FLOAT 1.0 / TokenType.FLOAT 2.0"]), repr(program)
+        )

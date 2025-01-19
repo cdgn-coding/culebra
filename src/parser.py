@@ -42,9 +42,11 @@ class Parser:
         statements = []
         while self._current_token is not None and self._current_token.type != TokenType.EOF:
             statement = self._parse_statement()
-            if statement is not None:
+            if statement is None:
+                self._advance_token()
+            else:
                 statements.append(statement)
-            self._advance_token()
+
 
         return Program(statements)
     
