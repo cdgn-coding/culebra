@@ -1,3 +1,4 @@
 nose
 mypy
 pytest
+llvmlite
