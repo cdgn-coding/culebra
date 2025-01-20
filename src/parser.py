@@ -75,11 +75,9 @@ class Parser:
         return Assignment(assignment_token, identifier, value)
     
     def _parse_expression(self) -> Expression:
-        while self._current_token.type != TokenType.NEWLINE:
-            expr = self._parse_comparison_expression()
-            self._advance_token()
-            return expr
-        pass
+        expr = self._parse_comparison_expression()
+        self._advance_token()
+        return expr
 
     def _expect_one_of(self, token_types: list[TokenType], token: Token) -> bool:
         if self._current_token.type not in token_types:
@@ -109,34 +107,32 @@ class Parser:
     def _parse_arithmetic_expression(self):
         term = self._parse_term()
 
-        if self._current_token.type == TokenType.PLUS:
+        # Continue parsing while we see + or - operators
+        while self._current_token and self._current_token.type in [TokenType.PLUS, TokenType.MINUS]:
             token = self._current_token
             self._advance_token()
             second_term = self._parse_term()
-            return PlusOperation(token, term, second_term)
-
-        if self._current_token.type == TokenType.MINUS:
-            token = self._current_token
-            self._advance_token()
-            second_term = self._parse_term()
-            return MinusOperation(token, term, second_term)
+            
+            if token.type == TokenType.PLUS:
+                term = PlusOperation(token, term, second_term)
+            else:  # MINUS
+                term = MinusOperation(token, term, second_term)
 
         return term
 
     def _parse_term(self):
         factor = self._parse_factor()
 
-        if self._current_token.type == TokenType.MUL:
+        # Continue parsing while we see * or / operators
+        while self._current_token and self._current_token.type in [TokenType.MUL, TokenType.DIV]:
             token = self._current_token
             self._advance_token()
             second_factor = self._parse_factor()
-            return MultiplicationOperation(token, factor, second_factor)
-
-        if self._current_token.type == TokenType.DIV:
-            token = self._current_token
-            self._advance_token()
-            second_factor = self._parse_factor()
-            return DivisionOperation(token, factor, second_factor)
+            
+            if token.type == TokenType.MUL:
+                factor = MultiplicationOperation(token, factor, second_factor)
+            else:  # DIV
+                factor = DivisionOperation(token, factor, second_factor)
 
         return factor
 

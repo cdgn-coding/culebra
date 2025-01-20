@@ -60,7 +60,7 @@ class Compiler:
                     var = ir.GlobalVariable(self.module, ir.DoubleType(), var_name)
                     var.initializer = value.type(0)
                 self.symbol_table[var_name] = var
-            
+
             # Store value and keep track of it
             self.builder.store(value, self.symbol_table[var_name])
 
