@@ -578,3 +578,27 @@ x4
             Token(TokenType.EOF, "")
         ]
         self.assertEqual(tokens, expected)
+
+    def test_comparison(self):
+        code = "1 > 2 >= 3 <= 4 < 5 == 6 != 7"
+        lexer = Lexer()
+        tokens = lexer.tokenize(code)
+
+        expected = [
+            Token(TokenType.NUMBER, "1"),
+            Token(TokenType.GREATER, ">"),
+            Token(TokenType.NUMBER, "2"),
+            Token(TokenType.GREATER_EQ, ">="),
+            Token(TokenType.NUMBER, "3"),
+            Token(TokenType.LESS_EQ, "<="),
+            Token(TokenType.NUMBER, "4"),
+            Token(TokenType.LESS, "<"),
+            Token(TokenType.NUMBER, "5"),
+            Token(TokenType.EQUAL, "=="),
+            Token(TokenType.NUMBER, "6"),
+            Token(TokenType.NOT_EQUAL, "!="),
+            Token(TokenType.NUMBER, "7"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.EOF, "")
+        ]
+        self.assertEqual(tokens, expected)

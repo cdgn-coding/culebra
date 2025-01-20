@@ -52,14 +52,17 @@ class Program(ASTNode):
     def __repr__(self) -> str:
         return "\n".join([str(stmt) for stmt in self.statements])
 
-class Identifier(Expression):
-    def __init__(self, token: Token, value: str):
+class LiteralValue[T](Expression, ABC):
+    def __init__(self, token: Token, value: T):
         super().__init__(token)
         self.value = value
 
     def __repr__(self) -> str:
         return f"{self.token_type()} {self.value}"
 
+class Identifier(LiteralValue[str]):
+    def __init__(self, token: Token, value: str):
+        super().__init__(token, value)
 
 class Assignment(Statement):
     def __init__(self, token: Token, identifier: Identifier, value: Expression):
@@ -73,89 +76,77 @@ class Assignment(Statement):
     def __repr__(self) -> str:
         return f"{self.token_type()} {self.identifier} = {self.value}"
 
-class Integer(Expression):
+class Integer(LiteralValue[int]):
     def __init__(self, token: Token, value: int):
-        super().__init__(token)
-        self.value = value
+        super().__init__(token, value)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.value}"
-
-class Float(Expression):
+class Float(LiteralValue[float]):
     def __init__(self, token: Token, value: float):
-        super().__init__(token)
-        self.value = value
+        super().__init__(token, value)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.value}"
-
-class String(Expression):
+class String(LiteralValue[str]):
     def __init__(self, token: Token, value: str):
-        super().__init__(token)
-        self.value = value
+        super().__init__(token, value)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.value}"
-
-class Bool(Expression):
+class Bool(LiteralValue[bool]):
     def __init__(self, token: Token, value: bool):
-        super().__init__(token)
-        self.value = value
+        super().__init__(token, value)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.value}"
-
-class PlusOperation(Expression):
+class BinaryOperation(Expression, ABC):
     def __init__(self, token: Token, left: Expression, right: Expression):
         super().__init__(token)
         self.left = left
         self.right = right
 
     def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} + {self.right}"
+        return f"{self.token_type()} {self.left} {self.token.literal} {self.right}"
 
-class MinusOperation(Expression):
+class PlusOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
-        super().__init__(token)
-        self.left = left
-        self.right = right
+        super().__init__(token, left, right)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} - {self.right}"
-
-class MultiplicationOperation(Expression):
+class MinusOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
-        super().__init__(token)
-        self.left = left
-        self.right = right
+        super().__init__(token, left, right)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} * {self.right}"
 
-class DivisionOperation(Expression):
+class MultiplicationOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
-        super().__init__(token)
-        self.left = left
-        self.right = right
+        super().__init__(token, left, right)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} / {self.right}"
-
-
-class AndOperation(Expression):
+class DivisionOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
-        super().__init__(token)
-        self.left = left
-        self.right = right
+        super().__init__(token, left, right)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} and {self.right}"
-
-class OrOperation(Expression):
+class AndOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
-        super().__init__(token)
-        self.left = left
-        self.right = right
+        super().__init__(token, left, right)
 
-    def __repr__(self) -> str:
-        return f"{self.token_type()} {self.left} or {self.right}"
+class OrOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+class GreaterOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+class GreaterOrEqualOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+class LessOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+
+class LessOrEqualOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+class EqualOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)
+
+class NotEqualOperation(BinaryOperation):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token, left, right)

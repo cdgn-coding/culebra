@@ -140,3 +140,12 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.IDENTIFIER x + TokenType.NUMBER 1', repr(program))
+
+
+    def test_comparison_operators(self):
+        source = "x = 2 >= 1"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.GREATER_EQ TokenType.NUMBER 2 >= TokenType.NUMBER 1', repr(program))

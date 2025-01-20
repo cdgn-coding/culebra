@@ -1,6 +1,5 @@
 from src.lexer import Lexer
-from src.ast import Program, Statement, Assignment, Identifier, Expression, Integer, String, Bool, Float, PlusOperation, \
-    MinusOperation, MultiplicationOperation, DivisionOperation, AndOperation, OrOperation
+from src.ast import *
 from typing import Optional
 from src.token import Token, TokenType
 
@@ -31,6 +30,15 @@ for_statement -> "for" assignment ";" expression ";" assignment ":" block
 block -> INDENT statement+ DEDENT
 return_statement -> "return" expression?
 """
+
+constructorMap = {
+    TokenType.LESS: LessOperation,
+    TokenType.LESS_EQ: LessOrEqualOperation,
+    TokenType.EQUAL: EqualOperation,
+    TokenType.GREATER: GreaterOperation,
+    TokenType.GREATER_EQ: GreaterOrEqualOperation,
+    TokenType.NOT_EQUAL: NotEqualOperation,
+}
 
 class Parser:
     def __init__(self, sequence: list[Token]):
@@ -118,7 +126,16 @@ class Parser:
         self.index += 1
 
     def _parse_comparison_expression(self) -> Expression:
-        return self._parse_arithmetic_expression()
+        first = self._parse_arithmetic_expression()
+
+        while self._current_token.type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.GREATER_EQ, TokenType.LESS_EQ]:
+            token = self._current_token
+            comparison_operator = constructorMap[token.type]
+            self._advance_token()
+            second_expr = self._parse_arithmetic_expression()
+            first = comparison_operator(token, first, second_expr)
+
+        return first
 
     def _parse_arithmetic_expression(self) -> Expression:
         term = self._parse_term()
@@ -155,7 +172,7 @@ class Parser:
 
         return factor
 
-    def _parse_factor(self) -> Expression:
+    def _parse_factor(self) -> Optional[Expression]:
         if self._current_token.type == TokenType.IDENTIFIER:
             factor = Identifier(self._current_token, self._current_token.literal)
             self._advance_token()
