@@ -88,6 +88,9 @@ TokenRegex = {
     TokenType.RETURN: re.compile(r"^return(?=\s|$)"),
     TokenType.FUNCTION_DEFINITION: re.compile(r"^def(?=[\s\(]|$)"),
     TokenType.BOOLEAN: re.compile(r"^(true|false)(?=[\s,:]|$)"),
+    TokenType.AND: re.compile(r"^and(?=\s|$)"),
+    TokenType.OR: re.compile(r"^or(?=\s|$)"),
+
     
     # Single-character tokens
     TokenType.LPAREN: re.compile(r"^\("),

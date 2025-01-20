@@ -1,6 +1,6 @@
 from src.lexer import Lexer
 from src.ast import Program, Statement, Assignment, Identifier, Expression, Integer, String, Bool, Float, PlusOperation, \
-    MinusOperation, MultiplicationOperation, DivisionOperation
+    MinusOperation, MultiplicationOperation, DivisionOperation, AndOperation, OrOperation
 from typing import Optional
 from src.token import Token, TokenType
 
@@ -58,13 +58,13 @@ class Parser:
         
     def _parse_assignment_statement(self) -> Optional[Assignment]:
         # Parse identifier of assigment
-        if not self._expect_one_of([TokenType.IDENTIFIER], self._current_token):
+        if not self._expect_one_of([TokenType.IDENTIFIER]):
             return None
         identifier = Identifier(self._current_token, self._current_token.literal)
         self._advance_token()
 
         # Get assigment token
-        if not self._expect_one_of([TokenType.ASSIGN], self._current_token):
+        if not self._expect_one_of([TokenType.ASSIGN]):
             return None
         assignment_token = self._current_token
         self._advance_token()
@@ -73,17 +73,31 @@ class Parser:
         value = self._parse_expression()
 
         return Assignment(assignment_token, identifier, value)
-    
-    def _parse_expression(self) -> Expression:
-        while self._current_token.type != TokenType.NEWLINE:
-            expr = self._parse_comparison_expression()
-            self._advance_token()
-            return expr
-        pass
 
-    def _expect_one_of(self, token_types: list[TokenType], token: Token) -> bool:
+    def _parse_expression(self) -> Expression:
+        expr = self._parse_logical_expression()
+        return expr
+    
+    def _parse_logical_expression(self) -> Expression:
+        first_expr = self._parse_comparison_expression()
+
+        while self._current_token.type in [TokenType.AND, TokenType.OR]:
+            if self._current_token.type == TokenType.AND:
+                token = self._current_token
+                self._advance_token()
+                second_expr = self._parse_comparison_expression()
+                first_expr = AndOperation(token, first_expr, second_expr)
+            elif self._current_token.type == TokenType.OR:
+                token = self._current_token
+                self._advance_token()
+                second_expr = self._parse_comparison_expression()
+                first_expr = OrOperation(token, first_expr, second_expr)
+
+        return first_expr
+
+    def _expect_one_of(self, token_types: list[TokenType]) -> bool:
         if self._current_token.type not in token_types:
-            self.errors.append(f"Expected any of {token_types}, got {token.type} instead")
+            self.errors.append(f"Expected any of {token_types}, got {self._current_token.type} instead")
             return False
 
         return True
@@ -103,44 +117,45 @@ class Parser:
     def _advance_token(self) -> None:
         self.index += 1
 
-    def _parse_comparison_expression(self):
+    def _parse_comparison_expression(self) -> Expression:
         return self._parse_arithmetic_expression()
 
-    def _parse_arithmetic_expression(self):
+    def _parse_arithmetic_expression(self) -> Expression:
         term = self._parse_term()
 
-        if self._current_token.type == TokenType.PLUS:
-            token = self._current_token
-            self._advance_token()
-            second_term = self._parse_term()
-            return PlusOperation(token, term, second_term)
+        while self._current_token.type in [TokenType.PLUS, TokenType.MINUS]:
+            if self._current_token.type == TokenType.PLUS:
+                token = self._current_token
+                self._advance_token()
+                second_term = self._parse_term()
+                term = PlusOperation(token, term, second_term)
 
-        if self._current_token.type == TokenType.MINUS:
-            token = self._current_token
-            self._advance_token()
-            second_term = self._parse_term()
-            return MinusOperation(token, term, second_term)
+            elif self._current_token.type == TokenType.MINUS:
+                token = self._current_token
+                self._advance_token()
+                second_term = self._parse_term()
+                term = MinusOperation(token, term, second_term)
 
         return term
 
-    def _parse_term(self):
+    def _parse_term(self) -> Expression:
         factor = self._parse_factor()
 
-        if self._current_token.type == TokenType.MUL:
-            token = self._current_token
-            self._advance_token()
-            second_factor = self._parse_factor()
-            return MultiplicationOperation(token, factor, second_factor)
-
-        if self._current_token.type == TokenType.DIV:
-            token = self._current_token
-            self._advance_token()
-            second_factor = self._parse_factor()
-            return DivisionOperation(token, factor, second_factor)
+        while self._current_token.type in [TokenType.MUL, TokenType.DIV]:
+            if self._current_token.type == TokenType.MUL:
+                token = self._current_token
+                self._advance_token()
+                second_factor = self._parse_factor()
+                return MultiplicationOperation(token, factor, second_factor)
+            elif self._current_token.type == TokenType.DIV:
+                token = self._current_token
+                self._advance_token()
+                second_factor = self._parse_factor()
+                return DivisionOperation(token, factor, second_factor)
 
         return factor
 
-    def _parse_factor(self):
+    def _parse_factor(self) -> Expression:
         if self._current_token.type == TokenType.IDENTIFIER:
             factor = Identifier(self._current_token, self._current_token.literal)
             self._advance_token()
@@ -166,4 +181,7 @@ class Parser:
             val = Float(self._current_token, float(self._current_token.literal))
             self._advance_token()
             return val
+        
+        self._expect_one_of([TokenType.IDENTIFIER, TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN, TokenType.FLOAT])
+        return None
 

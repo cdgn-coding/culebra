@@ -140,3 +140,22 @@ class DivisionOperation(Expression):
 
     def __repr__(self) -> str:
         return f"{self.token_type()} {self.left} / {self.right}"
+
+
+class AndOperation(Expression):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token)
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.left} and {self.right}"
+
+class OrOperation(Expression):
+    def __init__(self, token: Token, left: Expression, right: Expression):
+        super().__init__(token)
+        self.left = left
+        self.right = right
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.left} or {self.right}"

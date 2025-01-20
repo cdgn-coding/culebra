@@ -72,6 +72,23 @@ class TestLexer(TestCase):
 
         self.assertEqual(tokens, expected)
 
+    def test_and_or_tokens(self):
+        input_code = "true and or false"
+        lexer = Lexer()
+        tokens = lexer.tokenize(input_code)
+
+        expected = [
+            Token(TokenType.BOOLEAN, "true"),
+            Token(TokenType.AND, "and"),
+            Token(TokenType.OR, "or"),
+            Token(TokenType.BOOLEAN, "false"),
+            Token(TokenType.NEWLINE, "\n"),
+            Token(TokenType.EOF, "")
+        ]
+
+        self.assertEqual(tokens, expected)
+
+
     def test_arithmetic_operators(self):
         input_code = "+-*/"
         lexer = Lexer()
