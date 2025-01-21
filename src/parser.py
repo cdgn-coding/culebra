@@ -47,6 +47,21 @@ PrefixOperators = {
     TokenType.NOT: NotOperation,
 }
 
+TermOperators = {
+    TokenType.MUL: MultiplicationOperation,
+    TokenType.DIV: DivisionOperation,
+}
+
+ArithmeticOperators = {
+    TokenType.PLUS: PlusOperation,
+    TokenType.MINUS: MinusOperation,
+}
+
+LogicalOperators = {
+    TokenType.AND: AndOperation,
+    TokenType.OR: OrOperation,
+}
+
 class Parser:
     def __init__(self, sequence: list[Token]):
         self.sequence = sequence
@@ -96,17 +111,11 @@ class Parser:
     def _parse_logical_expression(self) -> Expression:
         first_expr = self._parse_comparison_expression()
 
-        while first_expr is not None and self._current_token.type in [TokenType.AND, TokenType.OR]:
-            if self._current_token.type == TokenType.AND:
-                token = self._current_token
-                self._advance_token()
-                second_expr = self._parse_comparison_expression()
-                first_expr = AndOperation(token, first_expr, second_expr)
-            elif self._current_token.type == TokenType.OR:
-                token = self._current_token
-                self._advance_token()
-                second_expr = self._parse_comparison_expression()
-                first_expr = OrOperation(token, first_expr, second_expr)
+        while first_expr is not None and self._current_token.type in LogicalOperators.keys():
+            token = self._current_token
+            self._advance_token()
+            second_expr = self._parse_comparison_expression()
+            first_expr = LogicalOperators[token.type](token, first_expr, second_expr)
 
         return first_expr
 
@@ -136,7 +145,7 @@ class Parser:
     def _parse_comparison_expression(self) -> Expression:
         first = self._parse_arithmetic_expression()
 
-        while first is not None and self._current_token.type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.GREATER_EQ, TokenType.LESS_EQ]:
+        while first is not None and self._current_token.type in ComparisonOperators.keys():
             token = self._current_token
             comparison_operator = ComparisonOperators[token.type]
             self._advance_token()
@@ -148,35 +157,22 @@ class Parser:
     def _parse_arithmetic_expression(self) -> Expression:
         term = self._parse_term()
 
-        while term is not None and self._current_token.type in [TokenType.PLUS, TokenType.MINUS]:
-            if self._current_token.type == TokenType.PLUS:
-                token = self._current_token
-                self._advance_token()
-                second_term = self._parse_term()
-                term = PlusOperation(token, term, second_term)
-
-            elif self._current_token.type == TokenType.MINUS:
-                token = self._current_token
-                self._advance_token()
-                second_term = self._parse_term()
-                term = MinusOperation(token, term, second_term)
+        while term is not None and self._current_token.type in ArithmeticOperators.keys():
+            token = self._current_token
+            self._advance_token()
+            second_term = self._parse_term()
+            term = ArithmeticOperators[token.type](token, term, second_term)
 
         return term
 
     def _parse_term(self) -> Expression:
         factor = self._parse_unary_expression()
 
-        while factor is not None and self._current_token.type in [TokenType.MUL, TokenType.DIV]:
-            if self._current_token.type == TokenType.MUL:
-                token = self._current_token
-                self._advance_token()
-                second_factor = self._parse_unary_expression()
-                return MultiplicationOperation(token, factor, second_factor)
-            elif self._current_token.type == TokenType.DIV:
-                token = self._current_token
-                self._advance_token()
-                second_factor = self._parse_unary_expression()
-                return DivisionOperation(token, factor, second_factor)
+        while factor is not None and self._current_token.type in TermOperators.keys():
+            token = self._current_token
+            self._advance_token()
+            second_factor = self._parse_unary_expression()
+            return TermOperators[token.type](token, factor, second_factor)
 
         return factor
 
