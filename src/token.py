@@ -57,6 +57,7 @@ class TokenType(Enum):
     # Logical operators
     AND      = auto()
     OR       = auto()
+    NOT = auto()
 
     # Expressions
     FUNCTION_CALL = auto()

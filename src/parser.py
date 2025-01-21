@@ -13,7 +13,9 @@ logical_expr -> comparison_expr (("and" | "or") comparison_expr)*
 comparison_expr -> arithmetic_expr ((">" | "<" | ">=" | "<=" | "==" | "!=") arithmetic_expr)*
 arithmetic_expr -> term (("+" | "-") term)*
 term -> factor (("*" | "/") factor)*
-factor -> identifier | literal | "(" expression ")" | function_call | array_literal | map_literal | set_literal
+factor -> unary_expr | elemental_expr
+unary_expr -> ("-") elemental_expr
+elemental_expr -> identifier | literal | "(" expression ")" | function_call | array_literal | map_literal | set_literal
 
 literal -> NUMBER | STRING | BOOLEAN | NULL
 array_literal -> "[" (expression ("," expression)*)? "]"
@@ -31,13 +33,18 @@ block -> INDENT statement+ DEDENT
 return_statement -> "return" expression?
 """
 
-constructorMap = {
+ComparisonOperators = {
     TokenType.LESS: LessOperation,
     TokenType.LESS_EQ: LessOrEqualOperation,
     TokenType.EQUAL: EqualOperation,
     TokenType.GREATER: GreaterOperation,
     TokenType.GREATER_EQ: GreaterOrEqualOperation,
     TokenType.NOT_EQUAL: NotEqualOperation,
+}
+
+PrefixOperators = {
+    TokenType.MINUS: NegativeOperation,
+    TokenType.NOT: NotOperation,
 }
 
 class Parser:
@@ -131,7 +138,7 @@ class Parser:
 
         while first is not None and self._current_token.type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.GREATER_EQ, TokenType.LESS_EQ]:
             token = self._current_token
-            comparison_operator = constructorMap[token.type]
+            comparison_operator = ComparisonOperators[token.type]
             self._advance_token()
             second_expr = self._parse_arithmetic_expression()
             first = comparison_operator(token, first, second_expr)
@@ -157,23 +164,42 @@ class Parser:
         return term
 
     def _parse_term(self) -> Expression:
-        factor = self._parse_factor()
+        factor = self._parse_unary_expression()
 
         while factor is not None and self._current_token.type in [TokenType.MUL, TokenType.DIV]:
             if self._current_token.type == TokenType.MUL:
                 token = self._current_token
                 self._advance_token()
-                second_factor = self._parse_factor()
+                second_factor = self._parse_unary_expression()
                 return MultiplicationOperation(token, factor, second_factor)
             elif self._current_token.type == TokenType.DIV:
                 token = self._current_token
                 self._advance_token()
-                second_factor = self._parse_factor()
+                second_factor = self._parse_unary_expression()
                 return DivisionOperation(token, factor, second_factor)
 
         return factor
 
-    def _parse_factor(self) -> Optional[Expression]:
+    def _parse_unary_expression(self) -> Expression:
+        if self._current_token.type not in PrefixOperators.keys():
+            return self._parse_elemental_expression()
+
+        tokens = [self._current_token]
+        self._advance_token()
+
+        while self._current_token.type in PrefixOperators.keys():
+            tokens.append(self._current_token)
+            self._advance_token()
+
+        expr = self._parse_expression()
+
+        while tokens:
+            token = tokens.pop()
+            expr = PrefixOperators[token.type](token, expr)
+
+        return expr
+
+    def _parse_elemental_expression(self) -> Optional[Expression]:
         if self._current_token.type == TokenType.IDENTIFIER:
             factor = Identifier(self._current_token, self._current_token.literal)
             self._advance_token()

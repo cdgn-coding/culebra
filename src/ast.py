@@ -150,3 +150,19 @@ class EqualOperation(BinaryOperation):
 class NotEqualOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
         super().__init__(token, left, right)
+
+class NegativeOperation(Expression):
+    def __init__(self, token: Token, value: Expression):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.token_type()}(PrefixOperation) {self.token_literal()} {self.value}"
+
+class NotOperation(Expression):
+    def __init__(self, token: Token, value: Expression):
+        super().__init__(token)
+        self.value = value
+    def __repr__(self) -> str:
+        return f"{self.token_type()} {self.token_literal()} {self.value}"
+

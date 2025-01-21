@@ -84,6 +84,7 @@ TokenRegex = {
     TokenType.BREAK: re.compile(r"^break(?=\s|$)"),
     TokenType.CONTINUE: re.compile(r"^continue(?=\s|$)"),
     TokenType.RETURN: re.compile(r"^return(?=\s|$)"),
+    TokenType.NOT: re.compile(r"^not(?=\s|$)"),
     TokenType.FUNCTION_DEFINITION: re.compile(r"^def(?=[\s\(]|$)"),
     TokenType.BOOLEAN: re.compile(r"^(true|false)(?=[\s,:]|$)"),
     TokenType.AND: re.compile(r"^and(?=\s|$)"),

@@ -1,3 +1,4 @@
+import unittest.mock
 from typing import cast
 from unittest import TestCase, skip
 from src.parser import Parser
@@ -24,7 +25,7 @@ class TestParser(TestCase):
         self.assertTrue(isinstance(program, Program))
         self.assertEqual(len(program.statements), 1)
 
-        expected_identifier = Identifier(Token(TokenType.IDENTIFIER, "x"), "x")
+        expected_identifier = Identifier(Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY), "x")
         actual_identifier = cast(Assignment, program.statements[0]).identifier
         self.assertEqual(repr(expected_identifier), repr(actual_identifier))
 
@@ -150,6 +151,35 @@ class TestParser(TestCase):
         self.assertTrue(isinstance(program, Program))
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.GREATER_EQ TokenType.NUMBER 2 >= TokenType.NUMBER 1', repr(program))
 
+    def test_negative_numbers(self):
+        source = "x = -2"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS(PrefixOperation) - TokenType.NUMBER 2', repr(program))
+
+
+    def test_sum_negative_numbers(self):
+        source = "x = -2 + -2"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS(PrefixOperation) - TokenType.PLUS TokenType.NUMBER 2 + TokenType.MINUS(PrefixOperation) - TokenType.NUMBER 2'
+        self.assertEqual(expected, repr(program))
+
+    def test_sum_not_unary(self):
+        source = "x = not true"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NOT not TokenType.BOOLEAN True'
+        self.assertEqual(expected, repr(program))
 
     def test_expected_identifier_or_literal_error(self):
         source = "x = +"
