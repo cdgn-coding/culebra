@@ -1,3 +1,4 @@
+import unittest.mock
 from typing import List
 from unittest import TestCase
 from src.lexer import Lexer
@@ -9,11 +10,11 @@ class TestLexer(TestCase):
         lexer = Lexer()
         tokens = lexer.tokenize(code)
         expected: List[Token] = [
-            Token(TokenType.ILLEGAL_CHARACTER, "$"),
-            Token(TokenType.ILLEGAL_CHARACTER, "@"),
-            Token(TokenType.ILLEGAL_CHARACTER, "?"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.ILLEGAL_CHARACTER, "$", unittest.mock.ANY),
+            Token(TokenType.ILLEGAL_CHARACTER, "@", unittest.mock.ANY),
+            Token(TokenType.ILLEGAL_CHARACTER, "?", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -23,9 +24,9 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(code)
         
         expected = [
-            Token(TokenType.NUMBER, "123"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.NUMBER, "123", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -33,8 +34,8 @@ class TestLexer(TestCase):
         lexer = Lexer()
         tokens = lexer.tokenize("")
         expected = [
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -44,15 +45,15 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.LBRACE, "{"),
-            Token(TokenType.RBRACE, "}"),
-            Token(TokenType.LBRACKET, "["),
-            Token(TokenType.RBRACKET, "]"),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.LBRACE, "{", unittest.mock.ANY),
+            Token(TokenType.RBRACE, "}", unittest.mock.ANY),
+            Token(TokenType.LBRACKET, "[", unittest.mock.ANY),
+            Token(TokenType.RBRACKET, "]", unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -63,11 +64,11 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "10"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "10", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -78,12 +79,12 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.BOOLEAN, "true"),
-            Token(TokenType.AND, "and"),
-            Token(TokenType.OR, "or"),
-            Token(TokenType.BOOLEAN, "false"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.BOOLEAN, "true", unittest.mock.ANY),
+            Token(TokenType.AND, "and", unittest.mock.ANY),
+            Token(TokenType.OR, "or", unittest.mock.ANY),
+            Token(TokenType.BOOLEAN, "false", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -95,12 +96,12 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.PLUS, "+"),
-            Token(TokenType.MINUS, "-"),
-            Token(TokenType.MUL, "*"),
-            Token(TokenType.DIV, "/"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.PLUS, "+", unittest.mock.ANY),
+            Token(TokenType.MINUS, "-", unittest.mock.ANY),
+            Token(TokenType.MUL, "*", unittest.mock.ANY),
+            Token(TokenType.DIV, "/", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -110,14 +111,14 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.EQUAL, "=="),
-            Token(TokenType.NOT_EQUAL, "!="),
-            Token(TokenType.LESS, "<"),
-            Token(TokenType.GREATER, ">"),
-            Token(TokenType.LESS_EQ, "<="),
-            Token(TokenType.GREATER_EQ, ">="),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.EQUAL, "==", unittest.mock.ANY),
+            Token(TokenType.NOT_EQUAL, "!=", unittest.mock.ANY),
+            Token(TokenType.LESS, "<", unittest.mock.ANY),
+            Token(TokenType.GREATER, ">", unittest.mock.ANY),
+            Token(TokenType.LESS_EQ, "<=", unittest.mock.ANY),
+            Token(TokenType.GREATER_EQ, ">=", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -128,12 +129,12 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.NUMBER, "123"),
-            Token(TokenType.IDENTIFIER, "someIdentifier"),
-            Token(TokenType.STRING, '"string literal"'),
-            Token(TokenType.FLOAT, "3.14"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.NUMBER, "123", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "someIdentifier", unittest.mock.ANY),
+            Token(TokenType.STRING, '"string literal"', unittest.mock.ANY),
+            Token(TokenType.FLOAT, "3.14", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         
         
@@ -145,11 +146,11 @@ class TestLexer(TestCase):
         tokens = lexer.tokenize(input_code)
 
         expected = [
-            Token(TokenType.IF, "if"),
-            Token(TokenType.ELSE, "else"),
-            Token(TokenType.ELIF, "elif"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IF, "if", unittest.mock.ANY),
+            Token(TokenType.ELSE, "else", unittest.mock.ANY),
+            Token(TokenType.ELIF, "elif", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -167,43 +168,43 @@ else:
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.IF, "if"),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.GREATER, ">"),
-            Token(TokenType.NUMBER, "10"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "print"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.STRING, '"x es mayor que 10"'),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.ELIF, "elif"),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.EQUAL, "=="),
-            Token(TokenType.NUMBER, "10"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "print"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.STRING, '"x es igual a 10"'),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.ELSE, "else"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "print"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.STRING, '"x es menor que 10"'),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.EOF, ""),
+            Token(TokenType.IF, "if", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.GREATER, ">", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "10", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "print", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.STRING, '"x es mayor que 10"', unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.ELIF, "elif", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.EQUAL, "==", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "10", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "print", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.STRING, '"x es igual a 10"', unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.ELSE, "else", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "print", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.STRING, '"x es menor que 10"', unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY),
         ]
 
         self.assertEqual(tokens, expected)
@@ -220,27 +221,27 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.FUNCTION_DEFINITION, "def"),
-            Token(TokenType.IDENTIFIER, "test"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.IDENTIFIER, "y"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.IDENTIFIER, "z"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "3"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.EOF, ""),
+            Token(TokenType.FUNCTION_DEFINITION, "def", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "test", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "y", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "z", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "3", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY),
         ]
         self.assertEqual(tokens, expected)
 
@@ -256,38 +257,38 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.FUNCTION_DEFINITION, "def"),
-            Token(TokenType.IDENTIFIER, "test"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IF, "if"),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.GREATER, ">"),
-            Token(TokenType.NUMBER, "0"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "print"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.STRING, '"positive"'),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.ELSE, "else"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "print"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.STRING, '"negative"'),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.EOF, ""),
+            Token(TokenType.FUNCTION_DEFINITION, "def", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "test", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IF, "if", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.GREATER, ">", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "0", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "print", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.STRING, '"positive"', unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.ELSE, "else", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "print", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.STRING, '"negative"', unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY),
         ]
         self.assertEqual(tokens, expected)
 
@@ -303,29 +304,29 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.FUNCTION_DEFINITION, "def"),
-            Token(TokenType.IDENTIFIER, "test"),
-            Token(TokenType.LPAREN, "("),
-            Token(TokenType.RPAREN, ")"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "y"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.IDENTIFIER, "z"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "3"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.EOF, ""),
+            Token(TokenType.FUNCTION_DEFINITION, "def", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "test", unittest.mock.ANY),
+            Token(TokenType.LPAREN, "(", unittest.mock.ANY),
+            Token(TokenType.RPAREN, ")", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "y", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "z", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "3", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY),
         ]
         self.assertEqual(tokens, expected)
 
@@ -335,15 +336,15 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "10"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.IDENTIFIER, "y"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "20"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "10", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "y", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "20", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -354,13 +355,13 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.STRING, '"""This is a\nmultiline string"""'),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.STRING, '"""This is a\nmultiline string"""', unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
 
         self.assertEqual(tokens, expected)
@@ -371,10 +372,10 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.BOOLEAN, "true"),
-            Token(TokenType.BOOLEAN, "false"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.BOOLEAN, "true", unittest.mock.ANY),
+            Token(TokenType.BOOLEAN, "false", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -384,23 +385,23 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.FOR, "for"),
-            Token(TokenType.IDENTIFIER, "i"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.NUMBER, "0"),
-            Token(TokenType.SEMICOLON, ";"),
-            Token(TokenType.IDENTIFIER, "i"),
-            Token(TokenType.LESS, "<"),
-            Token(TokenType.NUMBER, "10"),
-            Token(TokenType.SEMICOLON, ";"),
-            Token(TokenType.IDENTIFIER, "i"),
-            Token(TokenType.ASSIGN, "="),
-            Token(TokenType.IDENTIFIER, "i"),
-            Token(TokenType.PLUS, "+"),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.COLON, ":"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.FOR, "for", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "i", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "0", unittest.mock.ANY),
+            Token(TokenType.SEMICOLON, ";", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "i", unittest.mock.ANY),
+            Token(TokenType.LESS, "<", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "10", unittest.mock.ANY),
+            Token(TokenType.SEMICOLON, ";", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "i", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "i", unittest.mock.ANY),
+            Token(TokenType.PLUS, "+", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.COLON, ":", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -410,23 +411,23 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.LBRACKET, "["),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.STRING, '"text"'),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.FLOAT, "3.14"),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.BOOLEAN, "true"),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.LBRACE, "{"),
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.COMMA, ","),
-            Token(TokenType.NUMBER, "2"),
-            Token(TokenType.RBRACE, "}"),
-            Token(TokenType.RBRACKET, "]"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.LBRACKET, "[", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.STRING, '"text"', unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.FLOAT, "3.14", unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.BOOLEAN, "true", unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.LBRACE, "{", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.COMMA, ",", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "2", unittest.mock.ANY),
+            Token(TokenType.RBRACE, "}", unittest.mock.ANY),
+            Token(TokenType.RBRACKET, "]", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -435,8 +436,8 @@ def test():
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -446,13 +447,13 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.IDENTIFIER, "variable123"),
-            Token(TokenType.IDENTIFIER, "_private"),
-            Token(TokenType.IDENTIFIER, "num1"),
-            Token(TokenType.INVALID_IDENTIFIER, "1invalid"),
-            Token(TokenType.IDENTIFIER, "my_var_2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "variable123", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "_private", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "num1", unittest.mock.ANY),
+            Token(TokenType.INVALID_IDENTIFIER, "1invalid", unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "my_var_2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -462,9 +463,9 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.IDENTIFIER, "for_identifier_not_keyworkd"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "for_identifier_not_keyworkd", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -474,9 +475,9 @@ def test():
         tokens = lexer.tokenize(source)
         
         expected = [
-            Token(TokenType.IDENTIFIER, "if_identifier_not_keyworkd"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "if_identifier_not_keyworkd", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -489,15 +490,15 @@ z
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
-            Token(TokenType.IDENTIFIER, "x"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "y"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.IDENTIFIER, "z"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "y", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "z", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -512,21 +513,21 @@ x5
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
-            Token(TokenType.IDENTIFIER, "x1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "x2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "x3"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.IDENTIFIER, "x4"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.IDENTIFIER, "x5"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x3", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x4", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x5", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -539,17 +540,17 @@ x1
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
-            Token(TokenType.IDENTIFIER, "x1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "x2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "x3"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x3", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -563,19 +564,19 @@ x4
         lexer = Lexer()
         tokens = lexer.tokenize(source)
         expected = [
-            Token(TokenType.IDENTIFIER, "x1"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 1),
-            Token(TokenType.IDENTIFIER, "x2"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.INDENT, 2),
-            Token(TokenType.IDENTIFIER, "x3"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.DEDENT, None),
-            Token(TokenType.IDENTIFIER, "x4"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.IDENTIFIER, "x1", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 1, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x2", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.INDENT, 2, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x3", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.DEDENT, None, unittest.mock.ANY),
+            Token(TokenType.IDENTIFIER, "x4", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
 
@@ -585,20 +586,20 @@ x4
         tokens = lexer.tokenize(code)
 
         expected = [
-            Token(TokenType.NUMBER, "1"),
-            Token(TokenType.GREATER, ">"),
-            Token(TokenType.NUMBER, "2"),
-            Token(TokenType.GREATER_EQ, ">="),
-            Token(TokenType.NUMBER, "3"),
-            Token(TokenType.LESS_EQ, "<="),
-            Token(TokenType.NUMBER, "4"),
-            Token(TokenType.LESS, "<"),
-            Token(TokenType.NUMBER, "5"),
-            Token(TokenType.EQUAL, "=="),
-            Token(TokenType.NUMBER, "6"),
-            Token(TokenType.NOT_EQUAL, "!="),
-            Token(TokenType.NUMBER, "7"),
-            Token(TokenType.NEWLINE, "\n"),
-            Token(TokenType.EOF, "")
+            Token(TokenType.NUMBER, "1", unittest.mock.ANY),
+            Token(TokenType.GREATER, ">", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "2", unittest.mock.ANY),
+            Token(TokenType.GREATER_EQ, ">=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "3", unittest.mock.ANY),
+            Token(TokenType.LESS_EQ, "<=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "4", unittest.mock.ANY),
+            Token(TokenType.LESS, "<", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "5", unittest.mock.ANY),
+            Token(TokenType.EQUAL, "==", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "6", unittest.mock.ANY),
+            Token(TokenType.NOT_EQUAL, "!=", unittest.mock.ANY),
+            Token(TokenType.NUMBER, "7", unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
