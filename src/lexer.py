@@ -2,8 +2,6 @@
 
 from typing import List
 import re
-import sys
-from typing import NoReturn
 from src.token import Token, TokenType
 
 class Lexer:
@@ -17,7 +15,7 @@ class Lexer:
             is_legal = False
 
             if text[i] == '\n':
-                tokens.append(Token(TokenType.NEWLINE, '\n'))
+                tokens.append(Token(TokenType.NEWLINE, '\n', i))
                 indent = 0
                 i += 1
                 while i < len(text):
@@ -29,13 +27,13 @@ class Lexer:
                 current_indent = indent_stack[-1]
                 if indent > current_indent:
                     # Increasing indent
-                    tokens.append(Token(TokenType.INDENT, indent))
+                    tokens.append(Token(TokenType.INDENT, indent, i))
                     indent_stack.append(indent)
                 elif indent < current_indent:
                     # Decreasing indent - may need multiple DEDENT tokens
                     while indent < indent_stack[-1]:
                         indent_stack.pop()
-                        tokens.append(Token(TokenType.DEDENT, None))
+                        tokens.append(Token(TokenType.DEDENT, None, i))
                     ## TODO: esto esta mal
                     if indent != indent_stack[-1]:
                         raise IndentationError(f"Unindent does not match any outer indentation level")
@@ -47,7 +45,7 @@ class Lexer:
                 if match:
                     value = match.group(0)
                     if token_type not in [TokenType.WHITESPACE, TokenType.LINE_COMMENT]:
-                        token = Token(token_type, value)
+                        token = Token(token_type, value, i)
                         tokens.append(token)
                     i += len(value)
                     is_legal = True
@@ -55,22 +53,22 @@ class Lexer:
 
             if not is_legal:
                 char = chunk[0]
-                token = Token(TokenType.ILLEGAL_CHARACTER, char)
+                token = Token(TokenType.ILLEGAL_CHARACTER, char, i)
                 tokens.append(token)
                 i += 1
 
         if not tokens or tokens[-1].type != TokenType.NEWLINE:
-            tokens.append(Token(TokenType.NEWLINE, '\n'))
+            tokens.append(Token(TokenType.NEWLINE, '\n', i))
 
         # Handle any remaining dedents at the end of file
         while len(indent_stack) > 1:
             indent_stack.pop()
-            tokens.append(Token(TokenType.DEDENT, None))
+            tokens.append(Token(TokenType.DEDENT, None, i))
 
-        tokens.append(Token(TokenType.EOF, ""))
+        tokens.append(Token(TokenType.EOF, "", i))
         return tokens
 
-IndentRegex = re.compile(r"^(\t|    )")
+IndentRegex = re.compile(r"^(\t| {4})")
 
 TokenRegex = {
     TokenType.WHITESPACE: re.compile(r"^[\s]+"),

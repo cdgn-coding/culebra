@@ -74,10 +74,12 @@ class TokenType(Enum):
 class Token:
     type: TokenType
     literal: Optional[str]
+    pos: int
 
-    def __init__(self, type: TokenType, literal: Optional[str]):
+    def __init__(self, type: TokenType, literal: Optional[str], pos: int):
         self.type = type
         self.literal = literal
+        self.pos = pos
 
     def __eq__(self, other):
         if not isinstance(other, Token):

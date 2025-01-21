@@ -89,7 +89,7 @@ class Parser:
     def _parse_logical_expression(self) -> Expression:
         first_expr = self._parse_comparison_expression()
 
-        while self._current_token.type in [TokenType.AND, TokenType.OR]:
+        while first_expr is not None and self._current_token.type in [TokenType.AND, TokenType.OR]:
             if self._current_token.type == TokenType.AND:
                 token = self._current_token
                 self._advance_token()
@@ -105,7 +105,8 @@ class Parser:
 
     def _expect_one_of(self, token_types: list[TokenType]) -> bool:
         if self._current_token.type not in token_types:
-            self.errors.append(f"Expected any of {token_types}, got {self._current_token.type} instead")
+            ls = ','.join([t.name for t in token_types])
+            self.errors.append(f"Expected any of {ls}, got {self._current_token.type} instead in position {self._current_token.pos}")
             return False
 
         return True
@@ -128,7 +129,7 @@ class Parser:
     def _parse_comparison_expression(self) -> Expression:
         first = self._parse_arithmetic_expression()
 
-        while self._current_token.type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.GREATER_EQ, TokenType.LESS_EQ]:
+        while first is not None and self._current_token.type in [TokenType.GREATER, TokenType.LESS, TokenType.EQUAL, TokenType.NOT_EQUAL, TokenType.GREATER_EQ, TokenType.LESS_EQ]:
             token = self._current_token
             comparison_operator = constructorMap[token.type]
             self._advance_token()
@@ -140,7 +141,7 @@ class Parser:
     def _parse_arithmetic_expression(self) -> Expression:
         term = self._parse_term()
 
-        while self._current_token.type in [TokenType.PLUS, TokenType.MINUS]:
+        while term is not None and self._current_token.type in [TokenType.PLUS, TokenType.MINUS]:
             if self._current_token.type == TokenType.PLUS:
                 token = self._current_token
                 self._advance_token()
@@ -158,7 +159,7 @@ class Parser:
     def _parse_term(self) -> Expression:
         factor = self._parse_factor()
 
-        while self._current_token.type in [TokenType.MUL, TokenType.DIV]:
+        while factor is not None and self._current_token.type in [TokenType.MUL, TokenType.DIV]:
             if self._current_token.type == TokenType.MUL:
                 token = self._current_token
                 self._advance_token()

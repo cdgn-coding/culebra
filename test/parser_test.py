@@ -149,3 +149,12 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.GREATER_EQ TokenType.NUMBER 2 >= TokenType.NUMBER 1', repr(program))
+
+
+    def test_expected_identifier_or_literal_error(self):
+        source = "x = +"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        _ = parser.parse()
+        self.assertEqual(1, len(parser.errors))
+        self.assertEqual(['Expected any of IDENTIFIER,NUMBER,STRING,BOOLEAN,FLOAT, got TokenType.PLUS instead in position 4'], parser.errors)
