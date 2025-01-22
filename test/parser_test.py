@@ -188,4 +188,4 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         _ = parser.parse()
         self.assertEqual(1, len(parser.errors))
-        self.assertEqual(['Expected any of IDENTIFIER,NUMBER,STRING,BOOLEAN,FLOAT, got PLUS instead in position 4'], parser.errors)
+        self.assertEqual(['Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got PLUS instead in position 4'], parser.errors)

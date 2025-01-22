@@ -121,8 +121,8 @@ class Parser:
 
     def _expect_one_of(self, token_types: list[TokenType]) -> bool:
         if self._current_token.type not in token_types:
-            ls = ','.join([t.name for t in token_types])
-            self.errors.append(f"Expected any of {ls}, got {self._current_token.type.name} instead in position {self._current_token.pos}")
+            ls = ', '.join([t.name for t in token_types])
+            self.errors.append(f"Expected {ls}, got {self._current_token.type.name} instead in position {self._current_token.pos}")
             return False
 
         return True

@@ -23,9 +23,9 @@ class ASTNode(ABC):
             prefix = "    " * (level - 1)
             return f"{prefix}└──{repr(self)}"
 
-        prefix = "    " * (level - 1) +  "├── " if level > 0 else ""
+        prefix = "    " * (level - 1) +  "├── "
         result = prefix + self.node_name
-        # Recursively build tree for children
+
         for i, child in enumerate(self.children):
             result += "\n" + child.pretty(level + 1)
 
