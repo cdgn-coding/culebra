@@ -202,6 +202,16 @@ class TestParser(TestCase):
         expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), [Integer(1), Integer(2), Integer(3)]))'
         self.assertEqual(expected, repr(program))
 
+    def test_parentheses(self):
+        source = "x = 2 * (1+1)"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'Assignment(Identifier(x), MultiplicationOperation(Integer(2), PlusOperation(Integer(1), Integer(1))))'
+        self.assertEqual(expected, repr(program))
+
     def test_expected_identifier_or_literal_error(self):
         source = "x = +"
         sequence = Lexer().tokenize(source)

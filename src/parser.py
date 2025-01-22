@@ -217,6 +217,9 @@ class Parser:
         return expr
 
     def _parse_elemental_expression(self) -> Optional[Expression]:
+        if self._current_token.type == TokenType.LPAREN:
+            return self._parse_paren_grou_expression()
+
         if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.LPAREN:
             return self._parse_function_call()
 
@@ -269,3 +272,17 @@ class Parser:
         self._advance_token()
         return FunctionCall(token, identifier, arguments)
 
+    def _parse_paren_grou_expression(self) -> Optional[Expression]:
+        assert self._current_token.type == TokenType.LPAREN
+        self._advance_token()
+
+        expr = self._parse_expression()
+        if expr is None:
+            return None
+
+        if self._current_token.type != TokenType.RPAREN:
+            self._expect_one_of([TokenType.RPAREN])
+            return None
+
+        self._advance_token()
+        return expr
