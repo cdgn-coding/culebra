@@ -82,39 +82,46 @@ class Parser:
     
     def _parse_statement(self) -> Optional[Statement]:
         assert self._current_token is not None
+        if self._current_token.type in [TokenType.NEWLINE, TokenType.EOF]:
+            return None
 
         if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.ASSIGN:
             return self._parse_assignment_statement()
+
+        self._expect_one_of([TokenType.IDENTIFIER])
         
     def _parse_assignment_statement(self) -> Optional[Assignment]:
-        # Parse identifier of assigment
-        if not self._expect_one_of([TokenType.IDENTIFIER]):
-            return None
+        # Parse identifier
+        assert self._current_token.type == TokenType.IDENTIFIER
         identifier = Identifier(self._current_token, self._current_token.literal)
         self._advance_token()
 
-        # Get assigment token
-        if not self._expect_one_of([TokenType.ASSIGN]):
-            return None
+        assert self._current_token.type == TokenType.ASSIGN
         assignment_token = self._current_token
         self._advance_token()
 
         # Parse expression to assign
         value = self._parse_expression()
+        if value is None:
+            return None
 
         return Assignment(assignment_token, identifier, value)
 
-    def _parse_expression(self) -> Expression:
+    def _parse_expression(self) -> Optional[Expression]:
         expr = self._parse_logical_expression()
         return expr
     
-    def _parse_logical_expression(self) -> Expression:
+    def _parse_logical_expression(self) -> Optional[Expression]:
         first_expr = self._parse_comparison_expression()
+        if first_expr is None:
+            return None
 
         while first_expr is not None and self._current_token.type in LogicalOperators.keys():
             token = self._current_token
             self._advance_token()
             second_expr = self._parse_comparison_expression()
+            if second_expr is None:
+                return None
             first_expr = LogicalOperators[token.type](token, first_expr, second_expr)
 
         return first_expr
@@ -142,41 +149,53 @@ class Parser:
     def _advance_token(self) -> None:
         self.index += 1
 
-    def _parse_comparison_expression(self) -> Expression:
+    def _parse_comparison_expression(self) -> Optional[Expression]:
         first = self._parse_arithmetic_expression()
+        if first is None:
+            return None
 
         while first is not None and self._current_token.type in ComparisonOperators.keys():
             token = self._current_token
             comparison_operator = ComparisonOperators[token.type]
             self._advance_token()
             second_expr = self._parse_arithmetic_expression()
+            if second_expr is None:
+                return None
             first = comparison_operator(token, first, second_expr)
 
         return first
 
-    def _parse_arithmetic_expression(self) -> Expression:
+    def _parse_arithmetic_expression(self) -> Optional[Expression]:
         term = self._parse_term()
+        if term is None:
+            return None
 
         while term is not None and self._current_token.type in ArithmeticOperators.keys():
             token = self._current_token
             self._advance_token()
             second_term = self._parse_term()
+            if second_term is None:
+                return None
             term = ArithmeticOperators[token.type](token, term, second_term)
 
         return term
 
-    def _parse_term(self) -> Expression:
+    def _parse_term(self) -> Optional[Expression]:
         factor = self._parse_unary_expression()
+        if factor is None:
+            return None
 
         while factor is not None and self._current_token.type in TermOperators.keys():
             token = self._current_token
             self._advance_token()
             second_factor = self._parse_unary_expression()
+            if second_factor is None:
+                return None
             factor = TermOperators[token.type](token, factor, second_factor)
 
         return factor
 
-    def _parse_unary_expression(self) -> Expression:
+    def _parse_unary_expression(self) -> Optional[Expression]:
         if self._current_token.type not in PrefixOperators.keys():
             return self._parse_elemental_expression()
 
@@ -188,6 +207,8 @@ class Parser:
             self._advance_token()
 
         expr = self._parse_expression()
+        if expr is None:
+            return None
 
         while tokens:
             token = tokens.pop()
