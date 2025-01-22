@@ -269,6 +269,9 @@ class Parser:
                 self._advance_token()
                 continue
 
+            if not self._expect_one_of([TokenType.COMMA, TokenType.RPAREN]):
+                return None
+
         self._advance_token()
         return FunctionCall(token, identifier, arguments)
 

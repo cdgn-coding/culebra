@@ -202,6 +202,14 @@ class TestParser(TestCase):
         expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), [Integer(1), Integer(2), Integer(3)]))'
         self.assertEqual(expected, repr(program))
 
+    def test_function_call_with_arguments_error(self):
+        source = "x = print(1, 2, 3"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual(['Expected COMMA, RPAREN, got NEWLINE instead in position 17'], parser.errors)
+
     def test_parentheses(self):
         source = "x = 2 * (1+1)"
         sequence = Lexer().tokenize(source)
@@ -211,6 +219,14 @@ class TestParser(TestCase):
         self.assertEqual([], parser.errors)
         expected = 'Assignment(Identifier(x), MultiplicationOperation(Integer(2), PlusOperation(Integer(1), Integer(1))))'
         self.assertEqual(expected, repr(program))
+
+    def test_parentheses_error(self):
+        source = "x = 2 * (1+2"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual(['Expected RPAREN, got NEWLINE instead in position 12'], parser.errors)
 
     def test_expected_identifier_or_literal_error(self):
         source = "x = +"
