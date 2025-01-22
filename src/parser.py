@@ -172,7 +172,7 @@ class Parser:
             token = self._current_token
             self._advance_token()
             second_factor = self._parse_unary_expression()
-            return TermOperators[token.type](token, factor, second_factor)
+            factor = TermOperators[token.type](token, factor, second_factor)
 
         return factor
 
