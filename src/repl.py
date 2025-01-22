@@ -41,7 +41,7 @@ def process_lexer_input(text: str) -> bool:
 
     for token in tokens:
         if token.type != TokenType.EOF:
-            print(f"Token({token.type}, '{token.literal}')")
+            print(token)
 
     return True
 
@@ -60,7 +60,7 @@ def process_parser_input(text: str) -> bool:
         for error in parser.errors:
             print(f"\t{error}")
     else:
-        print(program.tree_str())
+        print(program.pretty())
 
     return True
 

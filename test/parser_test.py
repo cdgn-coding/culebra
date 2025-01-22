@@ -38,7 +38,7 @@ class TestParser(TestCase):
         self.assertEqual(len(program.statements), 1)
 
         actual_assignment = cast(Assignment, program.statements[0])
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NUMBER 1', repr(actual_assignment))
+        self.assertEqual('Assignment(Identifier(x), Integer(1))', repr(actual_assignment))
 
     def test_parse_literal_expressions_by_data_type(self):
         sources = [
@@ -50,11 +50,11 @@ class TestParser(TestCase):
         ]
 
         expected = [
-            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NUMBER 1",
-            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.FLOAT 1.0",
-            'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.STRING "1.0"',
-            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.BOOLEAN True",
-            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.BOOLEAN False",
+            "Assignment(Identifier(x), Integer(1))",
+            "Assignment(Identifier(x), Float(1.0))",
+            'Assignment(Identifier(x), String("1.0"))',
+            "Assignment(Identifier(x), Bool(True))",
+            "Assignment(Identifier(x), Bool(False))",
         ]
 
         for source, exp in zip(sources, expected):
@@ -70,7 +70,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 1 + TokenType.NUMBER 1', repr(program))
+        self.assertEqual('Assignment(Identifier(x), PlusOperation(Integer(1), Integer(1)))', repr(program))
 
     def test_parse_minus_expression(self):
         source = "x = 1 - 1"
@@ -78,7 +78,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS TokenType.NUMBER 1 - TokenType.NUMBER 1', repr(program))
+        self.assertEqual('Assignment(Identifier(x), MinusOperation(Integer(1), Integer(1)))', repr(program))
 
     def test_parse_multiplication_expressions(self):
         source = "x = 1 * 2"
@@ -86,7 +86,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MUL TokenType.NUMBER 1 * TokenType.NUMBER 2', repr(program))
+        self.assertEqual('Assignment(Identifier(x), MultiplicationOperation(Integer(1), Integer(2)))', repr(program))
 
     def test_parse_division_expressions(self):
         source = "x = 1 / 2"
@@ -94,7 +94,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.DIV TokenType.NUMBER 1 / TokenType.NUMBER 2', repr(program))
+        self.assertEqual('Assignment(Identifier(x), DivisionOperation(Integer(1), Integer(2)))', repr(program))
 
     def test_parse_recursive_arithmetic(self):
         source = "x = 2 + 3 * 2"
@@ -102,7 +102,8 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 2 + TokenType.MUL TokenType.NUMBER 3 * TokenType.NUMBER 2', repr(program))
+        self.assertEqual('Assignment(Identifier(x), PlusOperation(Integer(2), '
+ 'MultiplicationOperation(Integer(3), Integer(2))))', repr(program))
 
     def test_parse_multiple_recursive_arithmetic(self):
         source = "x = 2 + 3 * 2\ny = 1.0 + 1.0 / 2.0"
@@ -111,8 +112,8 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual("\n".join([
-            "TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.NUMBER 2 + TokenType.MUL TokenType.NUMBER 3 * TokenType.NUMBER 2",
-            "TokenType.ASSIGN TokenType.IDENTIFIER y = TokenType.PLUS TokenType.FLOAT 1.0 + TokenType.DIV TokenType.FLOAT 1.0 / TokenType.FLOAT 2.0"]), repr(program)
+            'Assignment(Identifier(x), PlusOperation(Integer(2), MultiplicationOperation(Integer(3), Integer(2))))',
+            'Assignment(Identifier(y), PlusOperation(Float(1.0), DivisionOperation(Float(1.0), Float(2.0))))']), repr(program)
         )
 
     def test_parse_all_arithmetic_operations(self):
@@ -121,9 +122,9 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.PLUS '
- 'TokenType.NUMBER 1 + TokenType.MUL TokenType.NUMBER 2 * TokenType.NUMBER 3 + '
- 'TokenType.DIV TokenType.NUMBER 4 / TokenType.NUMBER 5', repr(program))
+        self.assertEqual('Assignment(Identifier(x), PlusOperation(PlusOperation(Integer(1), '
+ 'MultiplicationOperation(Integer(2), Integer(3))), '
+ 'DivisionOperation(Integer(4), Integer(5))))', repr(program))
 
     def test_and_expression(self):
         source = "x = true and false"
@@ -132,7 +133,7 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual(
-            'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.AND TokenType.BOOLEAN True and TokenType.BOOLEAN False', repr(program))
+            'Assignment(Identifier(x), AndOperation(Bool(True), Bool(False)))', repr(program))
 
     def test_identifier_factor(self):
         source = "x = x + 1"
@@ -140,7 +141,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.PLUS TokenType.IDENTIFIER x + TokenType.NUMBER 1', repr(program))
+        self.assertEqual('Assignment(Identifier(x), PlusOperation(Identifier(x), Integer(1)))', repr(program))
 
 
     def test_comparison_operators(self):
@@ -149,7 +150,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.GREATER_EQ TokenType.NUMBER 2 >= TokenType.NUMBER 1', repr(program))
+        self.assertEqual('Assignment(Identifier(x), GreaterOrEqualOperation(Integer(2), Integer(1)))', repr(program))
 
     def test_negative_numbers(self):
         source = "x = -2"
@@ -158,7 +159,7 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual([], parser.errors)
-        self.assertEqual('TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS(PrefixOperation) - TokenType.NUMBER 2', repr(program))
+        self.assertEqual('Assignment(Identifier(x), NegativeOperation(Integer(2)))', repr(program))
 
 
     def test_sum_negative_numbers(self):
@@ -168,7 +169,7 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual([], parser.errors)
-        expected = 'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.MINUS(PrefixOperation) - TokenType.PLUS TokenType.NUMBER 2 + TokenType.MINUS(PrefixOperation) - TokenType.NUMBER 2'
+        expected = 'Assignment(Identifier(x), NegativeOperation(PlusOperation(Integer(2), NegativeOperation(Integer(2)))))'
         self.assertEqual(expected, repr(program))
 
     def test_sum_not_unary(self):
@@ -178,7 +179,7 @@ class TestParser(TestCase):
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
         self.assertEqual([], parser.errors)
-        expected = 'TokenType.ASSIGN TokenType.IDENTIFIER x = TokenType.NOT not TokenType.BOOLEAN True'
+        expected = 'Assignment(Identifier(x), NotOperation(Bool(True)))'
         self.assertEqual(expected, repr(program))
 
     def test_expected_identifier_or_literal_error(self):
@@ -187,4 +188,4 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         _ = parser.parse()
         self.assertEqual(1, len(parser.errors))
-        self.assertEqual(['Expected any of IDENTIFIER,NUMBER,STRING,BOOLEAN,FLOAT, got TokenType.PLUS instead in position 4'], parser.errors)
+        self.assertEqual(['Expected any of IDENTIFIER,NUMBER,STRING,BOOLEAN,FLOAT, got PLUS instead in position 4'], parser.errors)

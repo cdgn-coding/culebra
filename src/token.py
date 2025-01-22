@@ -87,8 +87,5 @@ class Token:
             return False
         return self.type == other.type and self.literal == other.literal
 
-    def __str__(self):
-        return f"Token({self.type}, {self.literal})"
-
     def __repr__(self):
-        return f"Token({self.type}, {self.literal})"
+        return f"{self.type.name} {self.literal}"
