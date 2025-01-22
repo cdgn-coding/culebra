@@ -200,3 +200,20 @@ class NotOperation(PrefixOperation):
     def __init__(self, token: Token, value: Expression):
         super().__init__(token, value)
 
+
+class FunctionCall(Expression, ABC):
+    def __init__(self, token: Token, function: Identifier, arguments: List[Expression]):
+        super().__init__(token)
+        self.function = function
+        self.arguments = arguments
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return self.arguments
+
+    @property
+    def node_name(self) -> str:
+        return f"{self.__class__.__name__}({self.function})"
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.function}, {self.arguments})"

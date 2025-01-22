@@ -182,6 +182,26 @@ class TestParser(TestCase):
         expected = 'Assignment(Identifier(x), NotOperation(Bool(True)))'
         self.assertEqual(expected, repr(program))
 
+    def test_function_call(self):
+        source = "x = print()"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), []))'
+        self.assertEqual(expected, repr(program))
+
+    def test_function_call_with_arguments(self):
+        source = "x = print(1, 2, 3)"
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), [Integer(1), Integer(2), Integer(3)]))'
+        self.assertEqual(expected, repr(program))
+
     def test_expected_identifier_or_literal_error(self):
         source = "x = +"
         sequence = Lexer().tokenize(source)

@@ -217,6 +217,9 @@ class Parser:
         return expr
 
     def _parse_elemental_expression(self) -> Optional[Expression]:
+        if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.LPAREN:
+            return self._parse_function_call()
+
         if self._current_token.type == TokenType.IDENTIFIER:
             factor = Identifier(self._current_token, self._current_token.literal)
             self._advance_token()
@@ -245,4 +248,24 @@ class Parser:
         
         self._expect_one_of([TokenType.IDENTIFIER, TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN, TokenType.FLOAT])
         return None
+
+    def _parse_function_call(self) -> Optional[Expression]:
+        token = self._current_token
+        identifier = Identifier(self._current_token, self._current_token.literal)
+        self._advance_token()
+        assert self._current_token.type == TokenType.LPAREN
+        self._advance_token()
+        arguments = []
+        while self._current_token.type != TokenType.RPAREN:
+            expr = self._parse_expression()
+            if expr is None:
+                return None
+            arguments.append(expr)
+
+            if self._current_token.type in [TokenType.COMMA]:
+                self._advance_token()
+                continue
+
+        self._advance_token()
+        return FunctionCall(token, identifier, arguments)
 
