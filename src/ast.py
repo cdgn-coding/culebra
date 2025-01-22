@@ -16,6 +16,30 @@ class ASTNode(ABC):
 
     def __str__(self) -> str:
         return self.__repr__()
+    
+    def tree_str(self, level: int = 0, is_last: bool = True) -> str:
+        prefix = "    " * (level - 1) + ("└── " if is_last else "├── ") if level > 0 else ""
+        result = prefix + self.token_type()
+        
+        # Handle different node types
+        if isinstance(self, Program):
+            children = self.statements
+        elif isinstance(self, BinaryOperation):
+            children = [self.left, self.right]
+        elif isinstance(self, Assignment):
+            children = [self.identifier, self.value]
+        elif isinstance(self, (NegativeOperation, NotOperation)):
+            children = [self.value]
+        elif isinstance(self, LiteralValue):
+            return prefix + f"{self.token_type()}({self.value})"
+        else:
+            children = []
+
+        # Recursively build tree for children
+        for i, child in enumerate(children):
+            result += "\n" + child.tree_str(level + 1, i == len(children) - 1)
+            
+        return result
 
 class Statement(ASTNode, ABC):
     def __init__(self, token: Token):
