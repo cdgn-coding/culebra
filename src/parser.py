@@ -88,7 +88,13 @@ class Parser:
         if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.ASSIGN:
             return self._parse_assignment_statement()
 
-        self._expect_one_of([TokenType.IDENTIFIER])
+        if self._current_token.type == TokenType.FUNCTION_DEFINITION:
+            return self._parse_function_definition()
+
+        if self._current_token.type == TokenType.RETURN:
+            return self._parse_return_statement()
+
+        self._expect_one_of([TokenType.IDENTIFIER, TokenType.FUNCTION_DEFINITION])
         
     def _parse_assignment_statement(self) -> Optional[Assignment]:
         # Parse identifier
@@ -218,7 +224,7 @@ class Parser:
 
     def _parse_elemental_expression(self) -> Optional[Expression]:
         if self._current_token.type == TokenType.LPAREN:
-            return self._parse_paren_grou_expression()
+            return self._parse_parentheses_group_expression()
 
         if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.LPAREN:
             return self._parse_function_call()
@@ -275,7 +281,7 @@ class Parser:
         self._advance_token()
         return FunctionCall(token, identifier, arguments)
 
-    def _parse_paren_grou_expression(self) -> Optional[Expression]:
+    def _parse_parentheses_group_expression(self) -> Optional[Expression]:
         assert self._current_token.type == TokenType.LPAREN
         self._advance_token()
 
@@ -289,3 +295,82 @@ class Parser:
 
         self._advance_token()
         return expr
+
+    def _parse_function_definition(self):
+        assert self._current_token.type == TokenType.FUNCTION_DEFINITION
+        token = self._current_token
+        self._advance_token()
+
+        identifier = self._parse_identifier()
+        if identifier is None:
+            return None
+
+        arguments = self._parse_argument_list()
+        if arguments is None:
+            return None
+
+        if not self._expect_one_of([TokenType.COLON]):
+            return None
+        self._advance_token()
+        if not self._expect_one_of([TokenType.NEWLINE]):
+            return None
+        self._advance_token()
+
+        block = self._parse_block()
+        self._advance_token()
+
+        return FunctionDefinition(token, identifier, arguments, block)
+
+    def _parse_identifier(self) -> Optional[Identifier]:
+        if not self._expect_one_of([TokenType.IDENTIFIER]):
+            return None
+        identifier = Identifier(self._current_token, self._current_token.literal)
+        self._advance_token()
+        return identifier
+
+    def _parse_argument_list(self) -> Optional[List[Identifier]]:
+        if not self._expect_one_of([TokenType.LPAREN]):
+            return None
+        self._advance_token()
+
+        arguments = []
+        while self._current_token.type != TokenType.RPAREN:
+            arg = self._parse_identifier()
+            if arg is None:
+                return None
+            arguments.append(arg)
+
+            if self._current_token.type in [TokenType.COMMA]:
+                self._advance_token()
+                continue
+
+            if not self._expect_one_of([TokenType.COMMA, TokenType.RPAREN]):
+                return None
+        self._advance_token()
+        return arguments
+
+    def _parse_block(self) -> Optional[Block]:
+        if not self._expect_one_of([TokenType.INDENT]):
+            return None
+        self._advance_token()
+
+        statements = []
+        while self._current_token.type != TokenType.DEDENT:
+            statement = self._parse_statement()
+            if statement is None:
+                self._advance_token()
+            else:
+                statements.append(statement)
+        self._advance_token()
+        return Block(statements)
+
+    def _parse_return_statement(self):
+        assert self._current_token.type == TokenType.RETURN
+        token = self._current_token
+        self._advance_token()
+        value = self._parse_expression()
+        if value is None:
+            return None
+        return ReturnStatement(token, value)
+
+

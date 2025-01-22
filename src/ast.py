@@ -61,7 +61,7 @@ class Expression(TokenizedASTNode, ABC):
     def token_type(self) -> TokenType:
         return self.token.type
 
-class Program(ASTNode):
+class Block(ASTNode):
     def __init__(self, statements: List[Statement]):
         self.statements = statements
 
@@ -71,6 +71,10 @@ class Program(ASTNode):
     @property
     def children(self) -> List['ASTNode']:
         return self.statements
+
+class Program(Block):
+    def __init__(self, statements: List[Statement]):
+        super().__init__(statements)
 
 class LiteralValue[T](Expression, ABC):
     def __init__(self, token: Token, value: T):
@@ -217,3 +221,33 @@ class FunctionCall(Expression, ABC):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.function}, {self.arguments})"
+
+class FunctionDefinition(Statement):
+    def __init__(self, token: Token, name: Identifier, arguments: List[Identifier], body: Block):
+        super().__init__(token)
+        self.name = name
+        self.arguments = arguments
+        self.body = body
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.name}, {self.arguments}, {self.body.statements})"
+
+    @property
+    def node_name(self) -> str:
+        return f"{self.__class__.__name__}({self.name}, {self.arguments})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return self.body.children
+
+class ReturnStatement(Statement):
+    def __init__(self, token: Token, value: Expression):
+        super().__init__(token)
+        self.value = value
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.value})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.value]

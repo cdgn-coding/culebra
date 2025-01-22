@@ -233,5 +233,17 @@ class TestParser(TestCase):
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         _ = parser.parse()
-        #self.assertEqual(1, len(parser.errors))
+        self.assertEqual(1, len(parser.errors))
         self.assertEqual(['Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got PLUS instead in position 4'], parser.errors)
+
+    def test_function_definition(self):
+        source = """
+def sum(x, y):
+    return x + y
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
+        self.assertEqual(expected, repr(program))
