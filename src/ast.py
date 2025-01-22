@@ -9,35 +9,30 @@ class ASTNode(ABC):
         pass
 
     @property
+    @abstractmethod
+    def children(self) -> List['ASTNode']:
+        pass
+
+    @property
     def node_name(self) -> str:
         return self.__class__.__name__
 
-    def pretty(self, level: int = 0, is_last: bool = True) -> str:
-        prefix = "    " * (level - 1) + ("└── " if is_last else "├── ") if level > 0 else ""
+    def pretty(self, level: int = 0) -> str:
+        is_last = len(self.children) == 0
+        if is_last:
+            prefix = "    " * (level - 1)
+            return f"{prefix}└──{repr(self)}"
+
+        prefix = "    " * (level - 1) +  "├── " if level > 0 else ""
         result = prefix + self.node_name
-
-        # Handle different node types
-        if isinstance(self, Program):
-            children = self.statements
-        elif isinstance(self, BinaryOperation):
-            children = [self.left, self.right]
-        elif isinstance(self, Assignment):
-            children = [self.identifier, self.value]
-        elif isinstance(self, PrefixOperation):
-            children = [self.value]
-        elif isinstance(self, LiteralValue):
-            return prefix + f"{self.node_name}({self.value})"
-        else:
-            children = []
-
         # Recursively build tree for children
-        for i, child in enumerate(children):
-            result += "\n" + child.pretty(level + 1, i == len(children) - 1)
+        for i, child in enumerate(self.children):
+            result += "\n" + child.pretty(level + 1)
 
         return result
 
 
-class TokenizedASTNode(ASTNode):
+class TokenizedASTNode(ASTNode, ABC):
     @abstractmethod
     def token_literal(self) -> str:
         pass
@@ -73,6 +68,10 @@ class Program(ASTNode):
     def __repr__(self) -> str:
         return "\n".join([str(stmt) for stmt in self.statements])
 
+    @property
+    def children(self) -> List['ASTNode']:
+        return self.statements
+
 class LiteralValue[T](Expression, ABC):
     def __init__(self, token: Token, value: T):
         super().__init__(token)
@@ -80,6 +79,11 @@ class LiteralValue[T](Expression, ABC):
 
     def __repr__(self) -> str:
         return f"{self.node_name}({self.value})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return []
+
 
 class Identifier(LiteralValue[str]):
     def __init__(self, token: Token, value: str):
@@ -93,6 +97,10 @@ class Assignment(Statement):
 
     def __repr__(self) -> str:
         return f"{self.node_name}({self.identifier}, {self.value})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.identifier, self.value]
 
 class Integer(LiteralValue[int]):
     def __init__(self, token: Token, value: int):
@@ -118,6 +126,10 @@ class BinaryOperation(Expression, ABC):
 
     def __repr__(self) -> str:
         return f"{self.node_name}({self.left}, {self.right})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.left, self.right]
 
 class PlusOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
@@ -175,6 +187,10 @@ class PrefixOperation(Expression, ABC):
 
     def __repr__(self) -> str:
         return f"{self.node_name}({self.value})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.value]
 
 class NegativeOperation(PrefixOperation):
     def __init__(self, token: Token, value: Expression):
