@@ -70,7 +70,7 @@ class Parser:
 
     def parse(self) -> Program:
         statements = []
-        while self._current_token is not None and self._current_token.type != TokenType.EOF:
+        while self._ignore_newlines() and self._has_token() and self._current_token.type != TokenType.EOF:
             statement = self._parse_statement()
             if statement is None:
                 self._advance_token()
@@ -312,9 +312,12 @@ class Parser:
         if not self._expect_one_of([TokenType.COLON]):
             return None
         self._advance_token()
+
+        # Expect one new line before parsing the block
         if not self._expect_one_of([TokenType.NEWLINE]):
             return None
         self._advance_token()
+        self._ignore_newlines()
 
         block = self._parse_block()
         self._advance_token()
@@ -355,7 +358,7 @@ class Parser:
         self._advance_token()
 
         statements = []
-        while self._current_token.type != TokenType.DEDENT:
+        while self._ignore_newlines() and self._has_token() and self._current_token.type != TokenType.DEDENT:
             statement = self._parse_statement()
             if statement is None:
                 self._advance_token()
@@ -374,3 +377,10 @@ class Parser:
         return ReturnStatement(token, value)
 
 
+    def _ignore_newlines(self):
+        while self._has_token() and self._current_token.type == TokenType.NEWLINE:
+            self._advance_token()
+        return True
+
+    def _has_token(self):
+        return self._current_token is not None

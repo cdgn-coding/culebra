@@ -88,4 +88,6 @@ class Token:
         return self.type == other.type and self.literal == other.literal
 
     def __repr__(self):
+        if self.type in [TokenType.NEWLINE, TokenType.DEDENT]:
+            return f"{self.type.name}"
         return f"{self.type.name} {self.literal}"

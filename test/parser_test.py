@@ -247,3 +247,18 @@ def sum(x, y):
         self.assertEqual([], parser.errors)
         expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
         self.assertEqual(expected, repr(program))
+
+    def test_function_definition_ignored_newlines(self):
+        source = """
+def sum(x, y):
+
+
+
+    return x + y
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
+        self.assertEqual(expected, repr(program))
