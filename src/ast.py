@@ -17,7 +17,7 @@ class ASTNode(ABC):
     def node_name(self) -> str:
         return self.__class__.__name__
 
-    def pretty(self, level: int = 0) -> str:
+    def pretty(self, level: int = 1) -> str:
         is_last = len(self.children) == 0
         if is_last:
             prefix = "    " * (level - 1)
