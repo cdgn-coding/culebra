@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from src.token import Token, TokenType
-from typing import List
+from typing import List, Optional
 
 
 class ASTNode(ABC):
@@ -51,8 +51,9 @@ class Statement(TokenizedASTNode, ABC):
     def token_type(self) -> TokenType:
         return self.token.type
 
-class Expression(TokenizedASTNode, ABC):
+class Expression(Statement, ABC):
     def __init__(self, token: Token):
+        super().__init__(token)
         self.token = token
 
     def token_literal(self) -> str:
@@ -251,3 +252,22 @@ class ReturnStatement(Statement):
     @property
     def children(self) -> List['ASTNode']:
         return [self.value]
+
+class Conditional(Statement):
+    def __init__(self, token: Token, condition: Expression, body: Block, otherwise: Optional['Conditional']):
+        super().__init__(token)
+        self.condition = condition
+        self.body = body
+        self.otherwise = otherwise
+
+    def __repr__(self) -> str:
+        if self.otherwise:
+            return f"{self.__class__.__name__}({self.condition}) Then [{self.body}] Else [{self.otherwise}]"
+        return f"{self.__class__.__name__}({self.condition}) Then [{self.body}]"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        if self.otherwise:
+            return [self.body, self.otherwise]
+
+        return [self.body]

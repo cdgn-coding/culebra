@@ -262,3 +262,29 @@ def sum(x, y):
         self.assertEqual([], parser.errors)
         expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
         self.assertEqual(expected, repr(program))
+
+    def test_if_statement(self):
+        source = """
+if true:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'Conditional(Bool(True)) Then [Identifier(pass)]'
+        self.assertEqual(expected, repr(program))
+
+    def test_if_statement_else(self):
+        source = """
+if true:
+    pass
+else:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]'
+        self.assertEqual(expected, repr(program))

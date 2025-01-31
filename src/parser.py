@@ -94,6 +94,13 @@ class Parser:
         if self._current_token.type == TokenType.RETURN:
             return self._parse_return_statement()
 
+        if self._current_token.type == TokenType.IF:
+            return self._parse_if_statement()
+
+        expr = self._parse_expression()
+        if expr is not None:
+            return expr
+
         self._expect_one_of([TokenType.IDENTIFIER, TokenType.FUNCTION_DEFINITION])
         
     def _parse_assignment_statement(self) -> Optional[Assignment]:
@@ -384,3 +391,27 @@ class Parser:
 
     def _has_token(self):
         return self._current_token is not None
+
+    def _parse_if_statement(self):
+        assert self._current_token.type == TokenType.IF
+        token = self._current_token
+        self._advance_token()
+
+        expr = self._parse_expression()
+        if expr is None:
+            return None
+
+        if not self._expect_one_of([TokenType.COLON]):
+            return None
+        self._advance_token()
+
+        # Expect one new line before parsing the block
+        if not self._expect_one_of([TokenType.NEWLINE]):
+            return None
+        self._advance_token()
+        self._ignore_newlines()
+
+        block = self._parse_block()
+        self._advance_token()
+
+        return Conditional(token, expr, block, None)

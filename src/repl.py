@@ -5,6 +5,7 @@ from src.lexer import Lexer
 from src.token import TokenType
 from src.parser import Parser
 
+
 def print_welcome_message(mode: str) -> None:
     """Print the initial welcome message and instructions."""
     print(r"""
@@ -27,8 +28,9 @@ def print_welcome_message(mode: str) -> None:
                ~--______-~                ~-___-~
     """)
     print(f"Welcome to the Culebra {mode.capitalize()} REPL!")
-    print("Type 'exit' or press Ctrl+D to quit")
-    print("Enter your code:")
+    print("Type 'exit' on a new line or press Ctrl+D to quit")
+    print("Enter your code (press Enter twice to execute):")
+
 
 def process_lexer_input(text: str) -> bool:
     """Process input in lexer mode."""
@@ -45,6 +47,7 @@ def process_lexer_input(text: str) -> bool:
 
     return True
 
+
 def process_parser_input(text: str) -> bool:
     """Process input in parser mode."""
     if text.lower().strip() == 'exit':
@@ -54,7 +57,7 @@ def process_parser_input(text: str) -> bool:
     lexer = Lexer()
     parser = Parser(lexer.tokenize(text))
     program = parser.parse()
-    
+
     if parser.errors:
         print("Parser Errors:")
         for error in parser.errors:
@@ -64,25 +67,39 @@ def process_parser_input(text: str) -> bool:
 
     return True
 
+
+def multiline_input(prompt=">>> ") -> str:
+    """Allows multi-line input until an empty line is encountered."""
+    lines = []
+    while True:
+        try:
+            line = input(prompt)
+            if line.strip() == "exit":
+                return "exit"
+            if line == "":
+                break
+            lines.append(line)
+            prompt = "... "  # Indent for additional lines
+        except EOFError:
+            print("\nGoodbye!")
+            return "exit"
+        except KeyboardInterrupt:
+            print("\nKeyboard interrupt received")
+            return "exit"
+    return "\n".join(lines)
+
+
 def repl(mode: str) -> NoReturn:
     """Run the REPL (Read-Eval-Print Loop)."""
     print_welcome_message(mode)
     process_func = process_lexer_input if mode == 'lexer' else process_parser_input
 
     while True:
-        try:
-            text = input(">>> ")
-            if not process_func(text):
-                break
-
-        except EOFError:
-            print("\nGoodbye!")
+        text = multiline_input()
+        if text == "exit":
             break
-        except KeyboardInterrupt:
-            print("\nKeyboard interrupt received")
-            continue
-        except Exception as e:
-            print(f"Error: {str(e)}", file=sys.stderr)
+        process_func(text)
+
 
 def setup_argparse() -> argparse.ArgumentParser:
     """Setup command line argument parser."""
@@ -92,10 +109,11 @@ def setup_argparse() -> argparse.ArgumentParser:
     )
     mode_group = parser.add_mutually_exclusive_group()
     mode_group.add_argument('-l', '--lexer', action='store_true',
-                          help='Run in lexer mode (shows tokens)')
+                            help='Run in lexer mode (shows tokens)')
     mode_group.add_argument('-p', '--parser', action='store_true',
-                          help='Run in parser mode (shows AST)')
+                            help='Run in parser mode (shows AST)')
     return parser
+
 
 def main() -> int:
     """Main entry point for the script."""
@@ -113,6 +131,7 @@ def main() -> int:
     except Exception as e:
         print(f"Fatal error: {str(e)}", file=sys.stderr)
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
