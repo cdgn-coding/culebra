@@ -45,28 +45,28 @@ Este lenguaje minimalista inspirado en Python y Go está diseñado para ser senc
   - [x] Asignaciones
 
 ### Características Pendientes ⏳
-- [ ] Estructuras de Control
-  - [ ] Condicionales (`if`, `elif`, `else`)
-  - [ ] Bucles `while`
-  - [ ] Bucles `for`
+- [x] Estructuras de Control
+  - [x] Condicionales (`if`, `elif`, `else`)
+  - [x] Bucles `while`
+  - [x] Bucles `for`
 
-- [ ] Funciones
-  - [ ] Definición de funciones
-  - [ ] Llamadas a funciones
-  - [ ] Sentencias `return`
+- [x] Funciones
+  - [x] Definición de funciones
+  - [x] Llamadas a funciones
+  - [x] Sentencias `return`
 
 - [ ] Estructuras de Datos Complejas
   - [ ] Arrays (`[...]`)
   - [ ] Mapas (`{clave: valor, ...}`)
   - [ ] Conjuntos (`{elemento, ...}`)
 
-- [ ] Otras Características
-  - [ ] Manejo de bloques (INDENT/DEDENT)
+- [x] Otras Características
+  - [x] Manejo de bloques (INDENT/DEDENT)
   - [ ] Valor nulo
 
 - [ ] Manejo de Errores
-  - [ ] Mejor reporte de errores
-  - [ ] Recuperación de errores de análisis
+  - [ ] Reporte de errores en línea durante parseo
+  - [ ] Reporte de errores en linea en chequeo de tipos
 
 
 - [ ] Interprete
