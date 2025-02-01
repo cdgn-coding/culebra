@@ -288,3 +288,34 @@ else:
         self.assertEqual([], parser.errors)
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]'
         self.assertEqual(expected, repr(program))
+
+    def test_if_statement_elif(self):
+        source = """
+if true:
+    pass
+elif false:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(False)) Then [Identifier(pass)]]'
+        self.assertEqual(expected, repr(program))
+
+    def test_if_statement_else_elif(self):
+        source = """
+if true:
+    pass
+elif true:
+    pass
+else:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]]'
+        self.assertEqual(expected, repr(program))
+

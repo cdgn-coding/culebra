@@ -316,16 +316,6 @@ class Parser:
         if arguments is None:
             return None
 
-        if not self._expect_one_of([TokenType.COLON]):
-            return None
-        self._advance_token()
-
-        # Expect one new line before parsing the block
-        if not self._expect_one_of([TokenType.NEWLINE]):
-            return None
-        self._advance_token()
-        self._ignore_newlines()
-
         block = self._parse_block()
         self._advance_token()
 
@@ -359,7 +349,7 @@ class Parser:
         self._advance_token()
         return arguments
 
-    def _parse_block(self) -> Optional[Block]:
+    def _parse_block_statements(self) -> Optional[Block]:
         if not self._expect_one_of([TokenType.INDENT]):
             return None
         self._advance_token()
@@ -393,7 +383,7 @@ class Parser:
         return self._current_token is not None
 
     def _parse_if_statement(self):
-        assert self._current_token.type == TokenType.IF
+        assert self._current_token.type in [TokenType.IF]
         token = self._current_token
         self._advance_token()
 
@@ -401,6 +391,37 @@ class Parser:
         if expr is None:
             return None
 
+        block = self._parse_block()
+        self._ignore_newlines()
+
+        if self._has_token() and self._current_token.type in [TokenType.ELSE, TokenType.ELIF]:
+            otherwise = self._parse_otherwise()
+            return Conditional(token, expr, block, otherwise)
+
+        return Conditional(token, expr, block, None)
+
+    def _parse_otherwise(self):
+        assert self._current_token.type in [TokenType.ELSE, TokenType.ELIF]
+        token = self._current_token
+        self._advance_token()
+
+        expr = Bool(token, True) if token.type == TokenType.ELSE else self._parse_expression()
+        if expr is None:
+            return None
+
+        block = self._parse_block()
+        self._ignore_newlines()
+
+        if token.type == TokenType.ELSE:
+            return Conditional(token, expr, block, None)
+
+        if self._has_token() and self._current_token.type in [TokenType.ELSE, TokenType.ELIF]:
+            otherwise = self._parse_otherwise()
+            return Conditional(token, expr, block, otherwise)
+
+        return Conditional(token, expr, block, None)
+
+    def _parse_block(self):
         if not self._expect_one_of([TokenType.COLON]):
             return None
         self._advance_token()
@@ -411,7 +432,5 @@ class Parser:
         self._advance_token()
         self._ignore_newlines()
 
-        block = self._parse_block()
-        self._advance_token()
-
-        return Conditional(token, expr, block, None)
+        block = self._parse_block_statements()
+        return block
