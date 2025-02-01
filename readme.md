@@ -1,5 +1,7 @@
 # Lenguaje de Programación CULEBRA
 
+[![Run Tests](https://github.com/cdgn-coding/culebra/actions/workflows/test.yaml/badge.svg)](https://github.com/cdgn-coding/culebra/actions/workflows/test.yaml)
+
 ```
       /^\/^\
     _|__|  O|
@@ -205,12 +207,3 @@ def cuadrado(x):
 
 print(cuadrado(5))
 ```
-
-## Filosofía de Diseño
-
-1. **Simplicidad**: Enfocado en una curva de aprendizaje suave y en tener una única forma correcta de hacer las cosas.
-
-2. **Estructuras Integradas**: Arrays, mapas, pilas, colas y más incluidos en el lenguaje para evitar dependencias externas.
-
-3. **Extensibilidad**: Capacidad de adaptar el lenguaje para soportar dominios específicos.
-
