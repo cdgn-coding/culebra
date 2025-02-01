@@ -319,3 +319,14 @@ else:
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]]'
         self.assertEqual(expected, repr(program))
 
+    def test_while(self):
+        source = """
+while true:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'WhileStatement(Bool(True)) Then [Identifier(pass)]'
+        self.assertEqual(expected, repr(program))

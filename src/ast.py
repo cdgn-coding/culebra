@@ -271,3 +271,16 @@ class Conditional(Statement):
             return [self.body, self.otherwise]
 
         return [self.body]
+
+class WhileStatement(Statement):
+    def __init__(self, token: Token, condition: Expression, body: Block):
+        super().__init__(token)
+        self.condition = condition
+        self.body = body
+
+    @property
+    def children(self):
+        return [self.condition, self.body]
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.condition}) Then [{self.body}]"

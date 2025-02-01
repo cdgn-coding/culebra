@@ -97,6 +97,9 @@ class Parser:
         if self._current_token.type == TokenType.IF:
             return self._parse_if_statement()
 
+        if self._current_token.type == TokenType.WHILE:
+            return self._parse_while()
+
         expr = self._parse_expression()
         if expr is not None:
             return expr
@@ -381,6 +384,19 @@ class Parser:
 
     def _has_token(self):
         return self._current_token is not None
+
+    def _parse_while(self):
+        assert self._current_token.type == TokenType.WHILE
+        token = self._current_token
+        self._advance_token()
+
+        expr = self._parse_expression()
+        if expr is None:
+            return None
+        block = self._parse_block()
+        self._ignore_newlines()
+
+        return WhileStatement(token, expr, block)
 
     def _parse_if_statement(self):
         assert self._current_token.type in [TokenType.IF]
