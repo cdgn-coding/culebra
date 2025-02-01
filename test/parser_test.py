@@ -330,3 +330,15 @@ while true:
         self.assertEqual([], parser.errors)
         expected = 'WhileStatement(Bool(True)) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
+
+    def test_for(self):
+        source = """
+for i = 0; i < 10; i = i + 1:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'ForStatement(Assignment(Identifier(i), Integer(0)); LessOperation(Identifier(i), Integer(10)); Assignment(Identifier(i), PlusOperation(Identifier(i), Integer(1)))) Then [Identifier(pass)]'
+        self.assertEqual(expected, repr(program))

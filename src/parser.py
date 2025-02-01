@@ -100,6 +100,9 @@ class Parser:
         if self._current_token.type == TokenType.WHILE:
             return self._parse_while()
 
+        if self._current_token.type == TokenType.FOR:
+            return self._parse_for()
+
         expr = self._parse_expression()
         if expr is not None:
             return expr
@@ -397,6 +400,39 @@ class Parser:
         self._ignore_newlines()
 
         return WhileStatement(token, expr, block)
+
+    def _parse_for(self):
+        assert self._current_token.type == TokenType.FOR
+        token = self._current_token
+        self._advance_token()
+
+        pre = self._parse_statement()
+        if pre is None:
+            return None
+
+        if not self._expect_one_of([TokenType.SEMICOLON]):
+            return None
+        self._advance_token()
+
+        condition = self._parse_expression()
+        if condition is None:
+            return None
+        if not self._expect_one_of([TokenType.SEMICOLON]):
+            return None
+        self._advance_token()
+
+        post = self._parse_statement()
+        if post is None:
+            return None
+
+        block = self._parse_block()
+        self._ignore_newlines()
+        if block is None:
+            return None
+
+        return ForStatement(token, condition, block, post, pre)
+
+
 
     def _parse_if_statement(self):
         assert self._current_token.type in [TokenType.IF]

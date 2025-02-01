@@ -284,3 +284,17 @@ class WhileStatement(Statement):
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.condition}) Then [{self.body}]"
+
+class ForStatement(Statement):
+    def __init__(self, token: Token, condition: Expression, body: Block, post: Statement, pre: Statement):
+        super().__init__(token)
+        self.condition = condition
+        self.body = body
+        self.post = post
+        self.pre = pre
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.pre}; {self.condition}; {self.post}) Then [{self.body}]"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.condition, self.pre, self.condition, self.post]
