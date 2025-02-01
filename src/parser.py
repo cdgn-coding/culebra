@@ -1,6 +1,4 @@
-from src.lexer import Lexer
 from src.ast import *
-from typing import Optional
 from src.token import Token, TokenType
 
 """
