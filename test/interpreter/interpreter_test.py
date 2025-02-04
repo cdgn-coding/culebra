@@ -134,3 +134,71 @@ e = true and true
         self.assertEqual(False, interpreter.root_environment.get('c'))
         self.assertEqual(False, interpreter.root_environment.get('d'))
         self.assertEqual(True, interpreter.root_environment.get('e'))
+
+    def test_basic_if(self):
+        source = """
+a = 1
+if true:
+    a = 2
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(2, interpreter.root_environment.get('a'))
+
+    def test_basic_else(self):
+        source = """
+a = 1
+if false:
+    a = 2
+else:
+    a = 3
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(3, interpreter.root_environment.get('a'))
+
+    def test_basic_elif(self):
+        source = """
+a = 1
+if false:
+    a = 2
+elif true:
+    a = 3
+else:
+    a = 4
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(3, interpreter.root_environment.get('a'))
+
+    def test_if_all_false(self):
+        source = """
+a = 1
+if false:
+    a = 2
+elif false:
+    a = 3
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(1, interpreter.root_environment.get('a'))

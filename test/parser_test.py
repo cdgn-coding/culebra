@@ -319,6 +319,34 @@ else:
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]]'
         self.assertEqual(expected, repr(program))
 
+    def test_elif_after_else(self):
+        source = """
+if true:
+    pass
+else:
+    pass
+elif true:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        parser.parse()
+        self.assertEqual(8, len(parser.errors))
+
+    def test_else_after_else(self):
+        source = """
+if true:
+    pass
+else:
+    pass
+else:
+    pass
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        parser.parse()
+        self.assertEqual(8, len(parser.errors))
+
     def test_while(self):
         source = """
 while true:

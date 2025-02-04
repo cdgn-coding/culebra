@@ -37,3 +37,9 @@ class Interpreter(Evaluable):
             token = node.token
             expression = self.__build_tree(node.value, current_environment)
             return evaluation_tree.UnaryOperation(expression, token)
+        if isinstance(node, ast.Conditional):
+            token = node.token
+            condition = self.__build_tree(node.condition, current_environment)
+            body = self.__build_tree(node.body, current_environment)
+            otherwise = None if not node.otherwise else self.__build_tree(node.otherwise, current_environment)
+            return evaluation_tree.Conditional(condition, body, otherwise, token)

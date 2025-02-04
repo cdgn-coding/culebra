@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, Optional
 
 from culebra.interpreter.environment import Environment
 from culebra.token import Token, TokenType
@@ -112,3 +112,17 @@ class UnaryOperation(Evaluable):
             return not expression
 
         raise AssertionError(f"Unexpected unary operation token {self.token}")
+
+class Conditional(Evaluable):
+    def __init__(self, condition: Evaluable, body: Evaluable, otherwise: Optional['Conditional'], token: Token):
+        self.condition = condition
+        self.body = body
+        self.otherwise = otherwise
+        self.token = token
+
+    def evaluate(self):
+        condition = self.condition.evaluate()
+        if condition:
+            self.body.evaluate()
+        elif self.otherwise:
+            self.otherwise.evaluate()
