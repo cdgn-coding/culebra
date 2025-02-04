@@ -126,3 +126,13 @@ class Conditional(Evaluable):
             self.body.evaluate()
         elif self.otherwise:
             self.otherwise.evaluate()
+
+class While(Evaluable):
+    def __init__(self, condition: Evaluable, body: Evaluable, token: Token):
+        self.condition = condition
+        self.body = body
+        self.token = token
+
+    def evaluate(self):
+        while self.condition.evaluate():
+            self.body.evaluate()

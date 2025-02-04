@@ -202,3 +202,18 @@ elif false:
         interpreter.evaluate()
 
         self.assertEqual(1, interpreter.root_environment.get('a'))
+
+    def test_while_loop(self):
+        source = """
+a = 0
+while a < 10:
+    a = a + 1
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(10, interpreter.root_environment.get('a'))
