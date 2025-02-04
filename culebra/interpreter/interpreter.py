@@ -55,3 +55,14 @@ class Interpreter(Evaluable):
             pre = self.__build_tree(node.pre, current_environment)
             post = self.__build_tree(node.post, current_environment)
             return evaluation_tree.For(condition, body, pre, post, token)
+        if isinstance(node, ast.FunctionDefinition):
+            token = node.token
+            body = self.__build_tree(node.body, current_environment)
+            arguments = [arg.value for arg in node.arguments]
+            name = node.name.value
+            return evaluation_tree.Function(name, arguments, body, current_environment, token)
+        if isinstance(node, ast.FunctionCall):
+            token = node.token
+            name = node.function.value
+            arguments = [self.__build_tree(arg, current_environment) for arg in node.arguments]
+            return evaluation_tree.FunctionCall(name, arguments, current_environment, token)

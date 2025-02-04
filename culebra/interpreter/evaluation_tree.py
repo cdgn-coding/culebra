@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Optional
+from typing import Union, Optional, List
 
 from culebra.interpreter.environment import Environment
 from culebra.token import Token, TokenType
@@ -49,7 +49,7 @@ class Assignment(Executable):
         self.environment.assign(self.identifier.name, self.expression.evaluate())
 
 class Block(Executable):
-    def __init__(self, body: list[Evaluable]):
+    def __init__(self, body: List[Evaluable]):
         self.body = body
 
     def evaluate(self):
@@ -150,3 +150,28 @@ class For(Evaluable):
         while self.condition.evaluate():
             self.body.evaluate()
             self.post.evaluate()
+
+class Function(Evaluable):
+    def __init__(self, name: str, arguments: List[str], body: Evaluable, environment: Environment, token: Token):
+        self.name = name
+        self.body = body
+        self.arguments = arguments
+        self.environment = environment
+        self.token = token
+
+    def evaluate(self):
+        self.environment.assign(self.name, self.__evaluate_function)
+
+    def __evaluate_function(self):
+        self.body.evaluate()
+
+class FunctionCall(Evaluable):
+    def __init__(self, function_name: str, arguments: List[Evaluable], environment: Environment, token: Token):
+        self.function = function_name
+        self.arguments = arguments
+        self.environment = environment
+        self.token = token
+
+    def evaluate(self):
+        function = self.environment.get(self.function)
+        function(*self.arguments)

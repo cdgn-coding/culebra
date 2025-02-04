@@ -232,3 +232,19 @@ for i = 0; i < 10; i = i + 1:
         interpreter.evaluate()
 
         self.assertEqual(2 ** 10, interpreter.root_environment.get('a'))
+
+    def test_function_definition_and_call_no_arguments_scope_access(self):
+        source = """
+a = 1
+def fn():
+    a = 10
+fn()
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(10, interpreter.root_environment.get('a'))

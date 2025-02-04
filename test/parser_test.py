@@ -192,6 +192,21 @@ class TestParser(TestCase):
         expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), []))'
         self.assertEqual(expected, repr(program))
 
+    def test_function_as_statement(self):
+        source = """
+a = 1
+def fn():
+    a = 10
+fn()
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertTrue(isinstance(program, Program))
+        self.assertEqual([], parser.errors)
+        expected = 'Assignment(Identifier(a), Integer(1))\nFunctionDefinition(Identifier(fn), [], [Assignment(Identifier(a), Integer(10))])\nFunctionCall(Identifier(fn), [])'
+        self.assertEqual(expected, repr(program))
+
     def test_function_call_with_arguments(self):
         source = "x = print(1, 2, 3)"
         sequence = Lexer().tokenize(source)

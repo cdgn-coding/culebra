@@ -321,7 +321,6 @@ class Parser:
             return None
 
         block = self._parse_block()
-        self._advance_token()
 
         return FunctionDefinition(token, identifier, arguments, block)
 
