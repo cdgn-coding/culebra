@@ -62,17 +62,21 @@ Este lenguaje minimalista inspirado en Python y Go está diseñado para ser senc
 
 - [x] Otras Características
   - [x] Manejo de bloques (INDENT/DEDENT)
-  - [ ] Valor nulo
+  - [ ] Valor nulo u Option
 
 - [ ] Manejo de Errores
   - [ ] Reporte de errores en línea durante parseo
+  - [ ] Reporte de errores en linea durante interpretación
   - [ ] Reporte de errores en linea en chequeo de tipos
 
 
-- [ ] Interprete
+- Interprete
   - [ ] Tree-walk interpreter
   - [ ] LLVM Just-in-time compiler
   - [ ] LLVM AOT compiler
+
+- Herramientas y soporte
+  - [ ] Soporte para syntaxis en VS Code con [TextMate](https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide#textmate-grammars)
 
 ## Características Principales
 
