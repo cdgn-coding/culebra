@@ -28,3 +28,8 @@ class Interpreter(Evaluable):
         if isinstance(node, (ast.Program, ast.Block)):
             statements = [self.__build_tree(node, current_environment) for node in node.statements]
             return  evaluation_tree.Block(statements)
+        if isinstance(node, ast.BinaryOperation):
+            token = node.token
+            left = self.__build_tree(node.left, current_environment)
+            right = self.__build_tree(node.right, current_environment)
+            return evaluation_tree.BinaryOperation(left, right, token)

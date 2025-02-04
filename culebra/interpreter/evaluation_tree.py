@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Union
 
 from culebra.interpreter.environment import Environment
-from culebra.token import Token
+from culebra.token import Token, TokenType
 
 
 class Evaluable[T](ABC):
@@ -55,3 +55,39 @@ class Block(Executable):
     def evaluate(self):
         for evaluable in self.body:
             evaluable.evaluate()
+
+class BinaryOperation(Evaluable):
+    def __init__(self, left: Evaluable, right: Evaluable, token: Token):
+        self.left = left
+        self.right = right
+        self.token = token
+
+    def evaluate(self):
+        left = self.left.evaluate()
+        right = self.right.evaluate()
+
+        # Arithmetic
+        if self.token.type == TokenType.PLUS:
+            return left + right
+        elif self.token.type == TokenType.MINUS:
+            return left - right
+        elif self.token.type == TokenType.MUL:
+            return left * right
+        elif self.token.type == TokenType.DIV:
+            return left / right
+
+        # Comparison
+        elif self.token.type == TokenType.EQUAL:
+            return left == right
+        elif self.token.type == TokenType.NOT_EQUAL:
+            return left != right
+        elif self.token.type == TokenType.LESS:
+            return left < right
+        elif self.token.type == TokenType.GREATER:
+            return left > right
+        elif self.token.type == TokenType.LESS_EQ:
+            return left <= right
+        elif self.token.type == TokenType.GREATER_EQ:
+            return left >= right
+
+        raise AssertionError(f"Unexpected binary operation token {self.token}")
