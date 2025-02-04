@@ -14,6 +14,10 @@ class Interpreter(Evaluable):
         return self.tree.evaluate()
 
     def __build_tree(self, node: ast.ASTNode, current_environment: Environment) -> evaluation_tree.Evaluable:
+        if isinstance(node, ast.Identifier):
+            name = node.value
+            token = node.token
+            return evaluation_tree.Identifier(name, current_environment, token)
         if isinstance(node, ast.Assignment):
             token = node.token
             identifier = Identifier(node.identifier.value, current_environment, node.identifier.token)

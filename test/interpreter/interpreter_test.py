@@ -16,3 +16,18 @@ class TestParser(TestCase):
         interpreter.evaluate()
 
         self.assertEqual(1, interpreter.root_environment.get('a'))
+
+    def test_reuse_variable(self):
+        source = """
+a = 1
+b = a
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(1, interpreter.root_environment.get('b'))
+
