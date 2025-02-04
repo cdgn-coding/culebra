@@ -90,6 +90,12 @@ class BinaryOperation(Evaluable):
         elif self.token.type == TokenType.GREATER_EQ:
             return left >= right
 
+        # Logical
+        elif self.token.type == TokenType.OR:
+            return left or right
+        elif self.token.type == TokenType.AND:
+            return left and right
+
         raise AssertionError(f"Unexpected binary operation token {self.token}")
 
 class UnaryOperation(Evaluable):

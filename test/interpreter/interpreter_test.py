@@ -113,3 +113,24 @@ d = 1.0
         self.assertEqual(False, interpreter.root_environment.get('b'))
         self.assertEqual(1, interpreter.root_environment.get('c'))
         self.assertEqual(1.0, interpreter.root_environment.get('d'))
+
+    def test_logical_operations(self):
+        source = """
+a = true or false
+b = true or true
+c = false or false
+d = true and false
+e = true and true
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(True, interpreter.root_environment.get('a'))
+        self.assertEqual(True, interpreter.root_environment.get('b'))
+        self.assertEqual(False, interpreter.root_environment.get('c'))
+        self.assertEqual(False, interpreter.root_environment.get('d'))
+        self.assertEqual(True, interpreter.root_environment.get('e'))
