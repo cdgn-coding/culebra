@@ -48,7 +48,6 @@ class TokenType(Enum):
     # Comparison operators
     EQUAL    = auto()
     NOT_EQUAL = auto()
-    NEG      = auto()
     LESS     = auto()
     GREATER  = auto()
     LESS_EQ  = auto()

@@ -91,3 +91,18 @@ class BinaryOperation(Evaluable):
             return left >= right
 
         raise AssertionError(f"Unexpected binary operation token {self.token}")
+
+class UnaryOperation(Evaluable):
+    def __init__(self, expression: Evaluable, token: Token):
+        self.expression = expression
+        self.token = token
+
+    def evaluate(self):
+        expression = self.expression.evaluate()
+
+        if self.token.type == TokenType.MINUS:
+            return -expression
+        elif self.token.type == TokenType.NOT:
+            return not expression
+
+        raise AssertionError(f"Unexpected unary operation token {self.token}")

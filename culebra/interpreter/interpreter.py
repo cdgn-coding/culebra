@@ -33,3 +33,7 @@ class Interpreter(Evaluable):
             left = self.__build_tree(node.left, current_environment)
             right = self.__build_tree(node.right, current_environment)
             return evaluation_tree.BinaryOperation(left, right, token)
+        if isinstance(node, ast.PrefixOperation):
+            token = node.token
+            expression = self.__build_tree(node.value, current_environment)
+            return evaluation_tree.UnaryOperation(expression, token)
