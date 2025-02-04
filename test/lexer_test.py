@@ -1,8 +1,8 @@
 import unittest.mock
 from typing import List
 from unittest import TestCase
-from src.lexer import Lexer
-from src.token import Token, TokenType
+from culebra.lexer import Lexer
+from culebra.token import Token, TokenType
 
 class TestLexer(TestCase):
     def test_illegal_character(self):

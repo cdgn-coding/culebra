@@ -1,5 +1,5 @@
-from src.ast import *
-from src.token import Token, TokenType
+from culebra.ast import *
+from culebra.token import Token, TokenType
 
 """
 program -> statement*

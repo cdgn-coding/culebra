@@ -1,10 +1,10 @@
 import unittest.mock
 from typing import cast
 from unittest import TestCase, skip
-from src.parser import Parser
-from src.lexer import Lexer
-from src.ast import Program, Assignment, Identifier
-from src.token import TokenType, Token
+from culebra.parser import Parser
+from culebra.lexer import Lexer
+from culebra.ast import Program, Assignment, Identifier
+from culebra.token import TokenType, Token
 
 
 class TestParser(TestCase):

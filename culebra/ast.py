@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.token import Token, TokenType
+from culebra.token import Token, TokenType
 from typing import List, Optional
 
 
@@ -30,7 +30,6 @@ class ASTNode(ABC):
             result += "\n" + child.pretty(level + 1)
 
         return result
-
 
 class TokenizedASTNode(ASTNode, ABC):
     @abstractmethod
@@ -88,7 +87,6 @@ class LiteralValue[T](Expression, ABC):
     @property
     def children(self) -> List['ASTNode']:
         return []
-
 
 class Identifier(LiteralValue[str]):
     def __init__(self, token: Token, value: str):
@@ -172,7 +170,6 @@ class LessOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
         super().__init__(token, left, right)
 
-
 class LessOrEqualOperation(BinaryOperation):
     def __init__(self, token: Token, left: Expression, right: Expression):
         super().__init__(token, left, right)
@@ -204,7 +201,6 @@ class NegativeOperation(PrefixOperation):
 class NotOperation(PrefixOperation):
     def __init__(self, token: Token, value: Expression):
         super().__init__(token, value)
-
 
 class FunctionCall(Expression, ABC):
     def __init__(self, token: Token, function: Identifier, arguments: List[Expression]):

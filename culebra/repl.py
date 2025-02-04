@@ -1,9 +1,9 @@
 import sys
 import argparse
 from typing import NoReturn
-from src.lexer import Lexer
-from src.token import TokenType
-from src.parser import Parser
+from culebra.lexer import Lexer
+from culebra.token import TokenType
+from culebra.parser import Parser
 
 
 def print_welcome_message(mode: str) -> None:

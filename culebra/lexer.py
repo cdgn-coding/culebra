@@ -2,7 +2,7 @@
 
 from typing import List
 import re
-from src.token import Token, TokenType
+from culebra.token import Token, TokenType
 
 class Lexer:
     def tokenize(self, text: str) -> List[Token]:
