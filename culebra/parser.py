@@ -397,7 +397,7 @@ class Parser:
         block = self._parse_block()
         self._ignore_newlines()
 
-        return WhileStatement(token, expr, block)
+        return While(token, expr, block)
 
     def _parse_for(self):
         assert self._current_token.type == TokenType.FOR
@@ -428,7 +428,7 @@ class Parser:
         if block is None:
             return None
 
-        return ForStatement(token, condition, block, post, pre)
+        return For(token, condition, block, post, pre)
 
 
 

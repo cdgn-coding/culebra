@@ -268,7 +268,7 @@ class Conditional(Statement):
 
         return [self.body]
 
-class WhileStatement(Statement):
+class While(Statement):
     def __init__(self, token: Token, condition: Expression, body: Block):
         super().__init__(token)
         self.condition = condition
@@ -281,7 +281,7 @@ class WhileStatement(Statement):
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.condition}) Then [{self.body}]"
 
-class ForStatement(Statement):
+class For(Statement):
     def __init__(self, token: Token, condition: Expression, body: Block, post: Statement, pre: Statement):
         super().__init__(token)
         self.condition = condition

@@ -136,3 +136,17 @@ class While(Evaluable):
     def evaluate(self):
         while self.condition.evaluate():
             self.body.evaluate()
+
+class For(Evaluable):
+    def __init__(self, condition: Evaluable, body: Evaluable, pre: Evaluable, post: Evaluable, token: Token):
+        self.condition = condition
+        self.body = body
+        self.pre = pre
+        self.post = post
+        self.token = token
+
+    def evaluate(self):
+        self.pre.evaluate()
+        while self.condition.evaluate():
+            self.body.evaluate()
+            self.post.evaluate()

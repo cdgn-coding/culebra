@@ -356,7 +356,7 @@ while true:
         parser = Parser(sequence)
         program = parser.parse()
         self.assertEqual([], parser.errors)
-        expected = 'WhileStatement(Bool(True)) Then [Identifier(pass)]'
+        expected = 'While(Bool(True)) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
 
     def test_for(self):
@@ -368,5 +368,5 @@ for i = 0; i < 10; i = i + 1:
         parser = Parser(sequence)
         program = parser.parse()
         self.assertEqual([], parser.errors)
-        expected = 'ForStatement(Assignment(Identifier(i), Integer(0)); LessOperation(Identifier(i), Integer(10)); Assignment(Identifier(i), PlusOperation(Identifier(i), Integer(1)))) Then [Identifier(pass)]'
+        expected = 'For(Assignment(Identifier(i), Integer(0)); LessOperation(Identifier(i), Integer(10)); Assignment(Identifier(i), PlusOperation(Identifier(i), Integer(1)))) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))

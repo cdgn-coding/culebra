@@ -43,8 +43,15 @@ class Interpreter(Evaluable):
             body = self.__build_tree(node.body, current_environment)
             otherwise = None if not node.otherwise else self.__build_tree(node.otherwise, current_environment)
             return evaluation_tree.Conditional(condition, body, otherwise, token)
-        if isinstance(node, ast.WhileStatement):
+        if isinstance(node, ast.While):
             token = node.token
             condition = self.__build_tree(node.condition, current_environment)
             body = self.__build_tree(node.body, current_environment)
             return evaluation_tree.While(condition, body, token)
+        if isinstance(node, ast.For):
+            token = node.token
+            condition = self.__build_tree(node.condition, current_environment)
+            body = self.__build_tree(node.body, current_environment)
+            pre = self.__build_tree(node.pre, current_environment)
+            post = self.__build_tree(node.post, current_environment)
+            return evaluation_tree.For(condition, body, pre, post, token)
