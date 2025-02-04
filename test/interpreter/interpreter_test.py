@@ -248,3 +248,40 @@ fn()
         interpreter.evaluate()
 
         self.assertEqual(10, interpreter.root_environment.get('a'))
+
+    def test_nested_block_function_loop(self):
+        source = """
+a = 0
+def fn():
+    for i = 0; i < 10; i = i + 1:
+        a = a + i
+fn()
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(45, interpreter.root_environment.get('a'))
+
+    def test_recursion_no_arguments(self):
+        source = """
+a = 1
+i = 1
+def fn():
+    if i < 5:
+        a = a * i
+        i = i + 1
+        fn()
+fn()
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(4*3*2*1, interpreter.root_environment.get('a'))
