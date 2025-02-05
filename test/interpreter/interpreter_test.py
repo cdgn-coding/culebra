@@ -285,3 +285,20 @@ fn()
         interpreter.evaluate()
 
         self.assertEqual(4*3*2*1, interpreter.root_environment.get('a'))
+
+    def test_recursion_with_arguments(self):
+        source = """
+def fn(a):
+    if a > 2:
+        return a * fn(a - 1)
+    return a
+result = fn(4)
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(4*3*2*1, interpreter.root_environment.get('result'))

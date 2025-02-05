@@ -385,3 +385,18 @@ for i = 0; i < 10; i = i + 1:
         self.assertEqual([], parser.errors)
         expected = 'For(Assignment(Identifier(i), Integer(0)); LessOperation(Identifier(i), Integer(10)); Assignment(Identifier(i), PlusOperation(Identifier(i), Integer(1)))) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
+
+    def test_recursion_with_arguments(self):
+        source = """
+def fn(a):
+    if a > 2:
+        return a * fn(a - 1)
+    return a
+result = fn(4)
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual([], parser.errors)
+        expected = 'FunctionDefinition(Identifier(fn), [Identifier(a)], [Conditional(GreaterOperation(Identifier(a), Integer(2))) Then [ReturnStatement(MultiplicationOperation(Identifier(a), FunctionCall(Identifier(fn), [MinusOperation(Identifier(a), Integer(1))])))], ReturnStatement(Identifier(a))])\nAssignment(Identifier(result), FunctionCall(Identifier(fn), [Integer(4)]))'
+        self.assertEqual(expected, repr(program))

@@ -7,15 +7,19 @@ from culebra.token import Token, TokenType
 
 class Evaluable[T](ABC):
     @abstractmethod
-    def evaluate(self) -> T:
+    def evaluate(self, environment: Environment) -> T:
         pass
+
 
 class Executable(Evaluable[None]):
     @abstractmethod
-    def evaluate(self) -> None:
+    def evaluate(self, environment: Environment) -> None:
         pass
 
+
 LITERAL_TYPES = Union[int, float, bool, str]
+
+
 class Literal[T = LITERAL_TYPES](Evaluable[T]):
     def __init__(self, value: T, token: Token):
         self.value = value
@@ -25,36 +29,38 @@ class Literal[T = LITERAL_TYPES](Evaluable[T]):
     def type(self):
         return type(self.value)
 
-    def evaluate(self) -> T:
+    def evaluate(self, environment: Environment) -> T:
         return self.value
 
+
 class Identifier(Evaluable):
-    def __init__(self, name: str, environment: Environment, token: Token):
+    def __init__(self, name: str, token: Token):
         self.name = name
-        self.environment = environment
         self.token = token
 
-    def evaluate(self):
-        return self.environment.get(self.name)
+    def evaluate(self, environment: Environment):
+        return environment.get(self.name)
 
 
 class Assignment(Executable):
-    def __init__(self, identifier: Identifier, expression: Evaluable, environment: Environment, token: Token):
+    def __init__(self, identifier: Identifier, expression: Evaluable, token: Token):
         self.identifier = identifier
         self.expression = expression
-        self.environment = environment
         self.token = token
 
-    def evaluate(self):
-        self.environment.assign(self.identifier.name, self.expression.evaluate())
+    def evaluate(self, environment: Environment):
+        environment.assign(self.identifier.name, self.expression.evaluate(environment))
+
 
 class Block(Executable):
     def __init__(self, body: List[Evaluable]):
         self.body = body
 
-    def evaluate(self):
+    def evaluate(self, environment: Environment):
         for evaluable in self.body:
-            evaluable.evaluate()
+            evaluable.evaluate(environment)
+
+
 
 class BinaryOperation(Evaluable):
     def __init__(self, left: Evaluable, right: Evaluable, token: Token):
@@ -62,9 +68,9 @@ class BinaryOperation(Evaluable):
         self.right = right
         self.token = token
 
-    def evaluate(self):
-        left = self.left.evaluate()
-        right = self.right.evaluate()
+    def evaluate(self, environment: Environment):
+        left = self.left.evaluate(environment)
+        right = self.right.evaluate(environment)
 
         # Arithmetic
         if self.token.type == TokenType.PLUS:
@@ -98,13 +104,14 @@ class BinaryOperation(Evaluable):
 
         raise AssertionError(f"Unexpected binary operation token {self.token}")
 
+
 class UnaryOperation(Evaluable):
     def __init__(self, expression: Evaluable, token: Token):
         self.expression = expression
         self.token = token
 
-    def evaluate(self):
-        expression = self.expression.evaluate()
+    def evaluate(self, environment: Environment):
+        expression = self.expression.evaluate(environment)
 
         if self.token.type == TokenType.MINUS:
             return -expression
@@ -113,6 +120,7 @@ class UnaryOperation(Evaluable):
 
         raise AssertionError(f"Unexpected unary operation token {self.token}")
 
+
 class Conditional(Evaluable):
     def __init__(self, condition: Evaluable, body: Evaluable, otherwise: Optional['Conditional'], token: Token):
         self.condition = condition
@@ -120,12 +128,13 @@ class Conditional(Evaluable):
         self.otherwise = otherwise
         self.token = token
 
-    def evaluate(self):
-        condition = self.condition.evaluate()
+    def evaluate(self, environment: Environment):
+        condition = self.condition.evaluate(environment)
         if condition:
-            self.body.evaluate()
+            self.body.evaluate(environment)
         elif self.otherwise:
-            self.otherwise.evaluate()
+            self.otherwise.evaluate(environment)
+
 
 class While(Evaluable):
     def __init__(self, condition: Evaluable, body: Evaluable, token: Token):
@@ -133,9 +142,10 @@ class While(Evaluable):
         self.body = body
         self.token = token
 
-    def evaluate(self):
-        while self.condition.evaluate():
-            self.body.evaluate()
+    def evaluate(self, environment: Environment):
+        while self.condition.evaluate(environment):
+            self.body.evaluate(environment)
+
 
 class For(Evaluable):
     def __init__(self, condition: Evaluable, body: Evaluable, pre: Evaluable, post: Evaluable, token: Token):
@@ -145,33 +155,52 @@ class For(Evaluable):
         self.post = post
         self.token = token
 
-    def evaluate(self):
-        self.pre.evaluate()
-        while self.condition.evaluate():
-            self.body.evaluate()
-            self.post.evaluate()
+    def evaluate(self, environment: Environment):
+        self.pre.evaluate(environment)
+        while self.condition.evaluate(environment):
+            self.body.evaluate(environment)
+            self.post.evaluate(environment)
+
 
 class Function(Evaluable):
-    def __init__(self, name: str, arguments: List[str], body: Evaluable, environment: Environment, token: Token):
+    def __init__(self, name: str, arguments: List[str], body: Evaluable, token: Token):
         self.name = name
         self.body = body
         self.arguments = arguments
-        self.environment = environment
         self.token = token
 
-    def evaluate(self):
-        self.environment.assign(self.name, self.__evaluate_function)
+    def evaluate(self, environment: Environment):
+        environment.assign(self.name, self)
 
-    def __evaluate_function(self):
-        self.body.evaluate()
+
+class ReturnValue(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
+class Return(Evaluable):
+    def __init__(self, expression: Evaluable, token: Token):
+        self.expression = expression
+        self.token = token
+
+    def evaluate(self, environment: Environment):
+        raise ReturnValue(self.expression.evaluate(environment))
+
 
 class FunctionCall(Evaluable):
-    def __init__(self, function_name: str, arguments: List[Evaluable], environment: Environment, token: Token):
+    def __init__(self, function_name: str, arguments: List[Evaluable], token: Token):
         self.function = function_name
         self.arguments = arguments
-        self.environment = environment
         self.token = token
 
-    def evaluate(self):
-        function = self.environment.get(self.function)
-        function(*self.arguments)
+    def evaluate(self, environment: Environment):
+        function = environment.get(self.function)
+        assert isinstance(function, Function)
+        function_environment = environment.create_child()
+        for name, value in zip(function.arguments, self.arguments):
+            function_environment.assign(name, value.evaluate(environment))
+        try:
+            function.body.evaluate(function_environment)
+        except ReturnValue as ret:
+            return ret.value
+        return None
