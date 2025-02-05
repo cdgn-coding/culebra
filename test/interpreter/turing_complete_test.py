@@ -82,3 +82,55 @@ result = power(2, 8)
         interpreter.evaluate()
 
         self.assertEqual(256, interpreter.root_environment.get('result'))
+
+    def test_ackermann_multiple_cases(self):
+        # This test verifies the Ackermann function for multiple input cases.
+        # It calculates:
+        # a0 = ack(0, 3) = 3 + 1 = 4
+        # a1 = ack(1, 3) = ack(0, ack(1,2)) = ack(0,4) = 5
+        # a2 = ack(2, 1) = ack(1, ack(2, 0)) = ack(1,3) = 5
+        # a3 = ack(2, 2) = 7
+        # Then, the composite result is computed as:
+        # result = a0*1000 + a1*100 + a2*10 + a3
+        # Expected result = 4*1000 + 5*100 + 5*10 + 7 = 4557
+        source = """
+def ack(m, n):
+    if m == 0:
+        return n + 1
+    if n == 0:
+        return ack(m - 1, 1)
+    return ack(m - 1, ack(m, n - 1))
+a0 = ack(0, 3)
+a1 = ack(1, 3)
+a2 = ack(2, 1)
+a3 = ack(2, 2)
+result = a0 * 1000 + a1 * 100 + a2 * 10 + a3
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(4557, interpreter.root_environment.get('result'))
+
+    def test_higher_order_function(self):
+        # This test verifies that functions are first-class and can be passed as arguments.
+        # The apply_twice function applies a given function twice to an argument.
+        # For example, apply_twice(increment, 3) should yield 5.
+        source = """
+def apply_twice(fn, x):
+    return fn(fn(x))
+def increment(n):
+    return n + 1
+result = apply_twice(increment, 3)
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(5, interpreter.root_environment.get('result'))
