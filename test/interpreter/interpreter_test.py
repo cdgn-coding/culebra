@@ -302,3 +302,43 @@ result = fn(4)
         interpreter.evaluate()
 
         self.assertEqual(4*3*2*1, interpreter.root_environment.get('result'))
+
+    def test_ackerman_function(self):
+        source = """
+def ack(m, n):
+    if m == 0:
+        return n + 1
+    if n == 0:
+        return ack(m - 1, 1)
+    return ack(m - 1, ack(m, n - 1))
+result = ack(2, 2)
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        self.assertEqual(7, interpreter.root_environment.get('result'))
+
+    def test_ackermann_intermediate(self):
+        source = """
+def ack(m, n):
+    if m == 0:
+        return n + 1
+    if n == 0:
+        return ack(m - 1, 1)
+    return ack(m - 1, ack(m, n - 1))
+result = ack(1, 2)
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter(program)
+        interpreter.evaluate()
+
+        # Expected ack(1,2) = ack(0, ack(1,0)) then ack(1,1) = ack(0, ack(1,0)) = ack(0,2) = 3, 
+        # so ack(1,2) = ack(0,3)=4
+        self.assertEqual(4, interpreter.root_environment.get('result'))

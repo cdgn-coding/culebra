@@ -198,7 +198,7 @@ class FunctionCall(Evaluable):
         assert isinstance(function, Function)
         function_environment = environment.create_child()
         for name, value in zip(function.arguments, self.arguments):
-            function_environment.assign(name, value.evaluate(environment))
+            function_environment.assign_current(name, value.evaluate(environment))
         try:
             function.body.evaluate(function_environment)
         except ReturnValue as ret:
