@@ -4,7 +4,7 @@ from typing import NoReturn
 from culebra.lexer import Lexer
 from culebra.token import TokenType
 from culebra.parser import Parser
-
+from culebra.error_reporter import ErrorReporter
 
 def print_welcome_message(mode: str) -> None:
     """Print the initial welcome message and instructions."""
@@ -102,7 +102,8 @@ def process_interpreter_input(text: str) -> bool:
     try:
         interpreter.evaluate(program)
     except Exception as e:
-        print(f"Runtime Error: {str(e)}")
+        reporter = ErrorReporter(text)
+        reporter.report(interpreter.last_node.token, str(e))
 
     return True
 

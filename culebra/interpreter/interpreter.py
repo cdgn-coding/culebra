@@ -125,38 +125,52 @@ class Interpreter:
     def __init__(self):
         self.root_environment = Environment()
         self.load_builtins()  # Load built-in functions into the environment
+        self.last_error = None
+        self.last_node = None
+
+    @property
+    def has_error(self):
+        return self.last_error is not None
 
     def evaluate(self, program: ast.Program):
+        self.last_error = None
+        self.last_node = None
         return self.eval_node(program, self.root_environment)
 
     def eval_node(self, node, environment):
-        # Dispatch evaluation based on the type of AST node.
-        if isinstance(node, ast.Identifier):
-            return self.evaluate_identifier(node, environment)
-        elif isinstance(node, ast.Assignment):
-            return self.evaluate_assignment(node, environment)
-        elif isinstance(node, ast.LiteralValue):
-            return self.evaluate_literal(node, environment)
-        elif isinstance(node, (ast.Program, ast.Block)):
-            return self.evaluate_block(node, environment)
-        elif isinstance(node, ast.BinaryOperation):
-            return self.evaluate_binary_operation(node, environment)
-        elif isinstance(node, ast.PrefixOperation):
-            return self.evaluate_prefix_operation(node, environment)
-        elif isinstance(node, ast.Conditional):
-            return self.evaluate_conditional(node, environment)
-        elif isinstance(node, ast.While):
-            return self.evaluate_while(node, environment)
-        elif isinstance(node, ast.For):
-            return self.evaluate_for(node, environment)
-        elif isinstance(node, ast.FunctionDefinition):
-            return self.evaluate_function_definition(node, environment)
-        elif isinstance(node, ast.FunctionCall):
-            return self.evaluate_function_call(node, environment)
-        elif isinstance(node, ast.ReturnStatement):
-            return self.evaluate_return(node, environment)
-        else:
-            raise TypeError(f"Unexpected AST node type: {type(node)}")
+        try:
+            # Dispatch evaluation based on the type of AST node.
+            if isinstance(node, ast.Identifier):
+                return self.evaluate_identifier(node, environment)
+            elif isinstance(node, ast.Assignment):
+                return self.evaluate_assignment(node, environment)
+            elif isinstance(node, ast.LiteralValue):
+                return self.evaluate_literal(node, environment)
+            elif isinstance(node, (ast.Program, ast.Block)):
+                return self.evaluate_block(node, environment)
+            elif isinstance(node, ast.BinaryOperation):
+                return self.evaluate_binary_operation(node, environment)
+            elif isinstance(node, ast.PrefixOperation):
+                return self.evaluate_prefix_operation(node, environment)
+            elif isinstance(node, ast.Conditional):
+                return self.evaluate_conditional(node, environment)
+            elif isinstance(node, ast.While):
+                return self.evaluate_while(node, environment)
+            elif isinstance(node, ast.For):
+                return self.evaluate_for(node, environment)
+            elif isinstance(node, ast.FunctionDefinition):
+                return self.evaluate_function_definition(node, environment)
+            elif isinstance(node, ast.FunctionCall):
+                return self.evaluate_function_call(node, environment)
+            elif isinstance(node, ast.ReturnStatement):
+                return self.evaluate_return(node, environment)
+            else:
+                raise TypeError(f"Unexpected AST node type: {type(node)}")
+        except Exception as e:
+            if not self.has_error:
+                self.last_error = e
+                self.last_node = node
+            raise e
 
     def evaluate_identifier(self, node, environment):
         # AST Identifier: node.value holds the variable name.

@@ -1,0 +1,8 @@
+"""
+Error at line 8:
+print(msg)
+      ^
+Undefined variable 'msg'
+"""
+
+print(msg)

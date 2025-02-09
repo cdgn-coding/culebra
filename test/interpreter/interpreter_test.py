@@ -342,3 +342,44 @@ result = ack(1, 2)
         # Expected ack(1,2) = ack(0, ack(1,0)) then ack(1,1) = ack(0, ack(1,0)) = ack(0,2) = 3, 
         # so ack(1,2) = ack(0,3)=4
         self.assertEqual(4, interpreter.root_environment.get('result'))
+
+    def test_nested_blocks(self):
+        source = """
+count = 0
+while count < 10:
+    count = count + 1
+    if count == 5:
+        count = count + 1
+        continue
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
+
+        self.assertEqual(10, interpreter.root_environment.get('count'))
+
+    def test_nested_blocks_inside_function(self):
+        source = """
+def fn():
+    count = 0
+    while count < 10:
+        count = count + 1
+        if count == 5:
+                count = count + 1
+                continue
+    return count
+result = fn()
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
+
+        # Expected ack(1,2) = ack(0, ack(1,0)) then ack(1,1) = ack(0, ack(1,0)) = ack(0,2) = 3, 
+        # so ack(1,2) = ack(0,3)=4
+        self.assertEqual(10, interpreter.root_environment.get('result'))
