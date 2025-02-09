@@ -3,7 +3,7 @@ from typing import cast
 from unittest import TestCase, skip
 from culebra.parser import Parser
 from culebra.lexer import Lexer
-from culebra.ast import Program, Assignment, Identifier
+from culebra.ast import Program, Assignment, Identifier, LiteralValue
 from culebra.token import TokenType, Token
 
 
@@ -52,7 +52,7 @@ class TestParser(TestCase):
         expected = [
             "Assignment(Identifier(x), Integer(1))",
             "Assignment(Identifier(x), Float(1.0))",
-            'Assignment(Identifier(x), String("1.0"))',
+            'Assignment(Identifier(x), String(1.0))',
             "Assignment(Identifier(x), Bool(True))",
             "Assignment(Identifier(x), Bool(False))",
         ]
@@ -400,3 +400,27 @@ result = fn(4)
         self.assertEqual([], parser.errors)
         expected = 'FunctionDefinition(Identifier(fn), [Identifier(a)], [Conditional(GreaterOperation(Identifier(a), Integer(2))) Then [ReturnStatement(MultiplicationOperation(Identifier(a), FunctionCall(Identifier(fn), [MinusOperation(Identifier(a), Integer(1))])))], ReturnStatement(Identifier(a))])\nAssignment(Identifier(result), FunctionCall(Identifier(fn), [Integer(4)]))'
         self.assertEqual(expected, repr(program))
+
+    def test_string_escape_sequences(self):
+        test_cases = [
+            ('"hello\\nworld"', "hello\nworld"),
+            ('"hello\\tworld"', "hello\tworld"),
+            ('"hello\\\\world"', "hello\\world"),
+            ('"hello\\"world\\""', 'hello"world"'),
+            ('"\\r\\n\\f\\b"', '\r\n\f\b'),
+            ('"no\\escape\\here"', 'no\\escape\\here'),
+            ('"""multi\\nline\\n"""', 'multi\nline\n'),
+        ]
+
+        for source, expected in test_cases:
+            sequence = Lexer().tokenize(source)
+            parser = Parser(sequence)
+            program = parser.parse()
+            self.assertEqual(len(program.statements), 1)
+            
+            expr_stmt = program.statements[0]
+            self.assertIsInstance(expr_stmt, LiteralValue)
+            
+            string_literal = expr_stmt.value
+            self.assertIsInstance(string_literal, str)
+            self.assertEqual(string_literal, expected)

@@ -603,3 +603,59 @@ x4
             Token(TokenType.EOF, "", unittest.mock.ANY)
         ]
         self.assertEqual(tokens, expected)
+
+    def test_string_with_escaped_quotes(self):
+        source = 'x = "Hello \\"World\\""'
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.IDENTIFIER, "x", unittest.mock.ANY),
+            Token(TokenType.ASSIGN, "=", unittest.mock.ANY),
+            Token(TokenType.STRING, '"Hello \\"World\\""', unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_string_with_escape_sequences(self):
+        source = '"\\n\\t\\\\"'  # String containing \n, \t, and \
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.STRING, '"\\n\\t\\\\"', unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_triple_quoted_string_with_escapes(self):
+        source = '"""This is a \\"triple\\" quoted string\\n"""'
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.STRING, '"""This is a \\"triple\\" quoted string\\n"""', unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_mixed_quotes_in_strings(self):
+        source = '"Contains \'single\' quotes"'
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        
+        expected = [
+            Token(TokenType.STRING, '"Contains \'single\' quotes"', unittest.mock.ANY),
+            Token(TokenType.NEWLINE, "\n", unittest.mock.ANY),
+            Token(TokenType.EOF, "", unittest.mock.ANY)
+        ]
+        self.assertEqual(tokens, expected)
+
+    def test_unterminated_string(self):
+        source = '"This string never ends...'
+        lexer = Lexer()
+        tokens = lexer.tokenize(source)
+        self.assertIn(Token(TokenType.ILLEGAL_CHARACTER, '"', unittest.mock.ANY), tokens)

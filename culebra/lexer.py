@@ -124,5 +124,5 @@ TokenRegex = {
     TokenType.FLOAT: re.compile(r"^[0-9]+\.[0-9]+"),
     TokenType.NUMBER: re.compile(r"^([0-9]+)"),
     TokenType.IDENTIFIER: re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*"),
-    TokenType.STRING: re.compile(r'^"""[\s\S]*?"""|"[^"]*"'),
+    TokenType.STRING: re.compile(r'^"""[\s\S]*?"""|"(?:[^"\\]|\\.)*"'),
 }
