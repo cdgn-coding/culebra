@@ -54,6 +54,9 @@ def process_parser_input(text: str) -> bool:
         print("Goodbye!")
         return False
 
+    # Convert tab indentation to 4 spaces for the parser.
+    text = text.replace("\t", "    ")
+
     lexer = Lexer()
     parser = Parser(lexer.tokenize(text))
     program = parser.parse()
@@ -69,17 +72,27 @@ def process_parser_input(text: str) -> bool:
 
 
 def multiline_input(prompt=">>> ") -> str:
-    """Allows multi-line input until an empty line is encountered."""
+    """Allows multi-line input until an empty line is encountered, with auto-indentation.
+    
+    If a line ends with a ':' character, the next input prompt will be indented with a tab.
+    """
     lines = []
+    current_indent = ""
+    current_prompt = prompt + current_indent  # initial prompt e.g. ">>> "
     while True:
         try:
-            line = input(prompt)
+            line = input(current_prompt)
             if line.strip() == "exit":
                 return "exit"
             if line == "":
                 break
-            lines.append(line)
-            prompt = "... "  # Indent for additional lines
+            # Append the line with the current indentation.
+            lines.append(current_indent + line)
+            # If the trimmed line ends with ':', increase the indentation (adds one tab).
+            if line.rstrip().endswith(':'):
+                current_indent += "\t"
+            # Update the prompt for the next line to include the current indentation.
+            current_prompt = "... " + current_indent
         except EOFError:
             print("\nGoodbye!")
             return "exit"
