@@ -70,6 +70,42 @@ def process_parser_input(text: str) -> bool:
 
     return True
 
+interpreter = None
+
+def get_interpreter():
+    global interpreter
+    if interpreter is None:
+        from culebra.interpreter.interpreter import Interpreter
+        interpreter = Interpreter()
+    return interpreter
+
+def process_interpreter_input(text: str) -> bool:
+    """Process input in interpreter mode."""
+    if text.lower().strip() == 'exit':
+        print("Goodbye!")
+        return False
+
+    # Convert tab indentation to 4 spaces
+    text = text.replace("\t", "    ")
+
+    lexer = Lexer()
+    parser = Parser(lexer.tokenize(text))
+    program = parser.parse()
+
+    if parser.errors:
+        print("Parser Errors:")
+        for error in parser.errors:
+            print(f"\t{error}")
+        return True
+
+    interpreter = get_interpreter()
+    try:
+        interpreter.evaluate(program)
+    except Exception as e:
+        print(f"Runtime Error: {str(e)}")
+
+    return True
+
 
 def multiline_input(prompt=">>> ") -> str:
     """Allows multi-line input until an empty line is encountered, with auto-indentation.
@@ -105,7 +141,7 @@ def multiline_input(prompt=">>> ") -> str:
 def repl(mode: str) -> NoReturn:
     """Run the REPL (Read-Eval-Print Loop)."""
     print_welcome_message(mode)
-    process_func = process_lexer_input if mode == 'lexer' else process_parser_input
+    process_func = process_lexer_input if mode == 'lexer' else process_parser_input if mode == 'parser' else process_interpreter_input
 
     while True:
         text = multiline_input()
@@ -125,6 +161,8 @@ def setup_argparse() -> argparse.ArgumentParser:
                             help='Run in lexer mode (shows tokens)')
     mode_group.add_argument('-p', '--parser', action='store_true',
                             help='Run in parser mode (shows AST)')
+    mode_group.add_argument('-i', '--interpreter', action='store_true',
+                            help='Run in interpreter mode (default)')
     return parser
 
 
@@ -134,11 +172,11 @@ def main() -> int:
         arg_parser = setup_argparse()
         args = arg_parser.parse_args()
 
-        if not (args.lexer or args.parser):
-            arg_parser.print_help()
-            return 0
+        # Default to interpreter mode if no mode is specified
+        if not (args.lexer or args.parser or args.interpreter):
+            args.interpreter = True
 
-        mode = 'lexer' if args.lexer else 'parser'
+        mode = 'lexer' if args.lexer else 'parser' if args.parser else 'interpreter'
         repl(mode)
         return 0
     except Exception as e:

@@ -1,0 +1,7 @@
+a = input("a = ")
+b = input("b = ")
+
+if a > b:
+    print("a is greater than b")
+else:
+    print("b is greater or equal to a")

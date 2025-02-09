@@ -12,8 +12,8 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(1, interpreter.root_environment.get('a'))
 
@@ -26,8 +26,8 @@ b = a
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(1, interpreter.root_environment.get('b'))
 
@@ -42,8 +42,8 @@ d = 1 / 2
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(3, interpreter.root_environment.get('a'))
         self.assertEqual(2, interpreter.root_environment.get('b'))
@@ -58,8 +58,8 @@ a = 1 + 2 * 2 + 5 / 5
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(1 + 2 * 2 + 5 / 5, interpreter.root_environment.get('a'))
 
@@ -71,8 +71,8 @@ a = 1 + 2 * 2 + 5 / 5 + -1
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(1 + 2 * 2 + 5 / 5 + -1, interpreter.root_environment.get('a'))
 
@@ -87,8 +87,8 @@ d = 1 <= 1
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(True, interpreter.root_environment.get('a'))
         self.assertEqual(False, interpreter.root_environment.get('b'))
@@ -106,8 +106,8 @@ d = 1.0
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(True, interpreter.root_environment.get('a'))
         self.assertEqual(False, interpreter.root_environment.get('b'))
@@ -126,8 +126,8 @@ e = true and true
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(True, interpreter.root_environment.get('a'))
         self.assertEqual(True, interpreter.root_environment.get('b'))
@@ -145,8 +145,8 @@ if true:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(2, interpreter.root_environment.get('a'))
 
@@ -162,8 +162,8 @@ else:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(3, interpreter.root_environment.get('a'))
 
@@ -181,8 +181,8 @@ else:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(3, interpreter.root_environment.get('a'))
 
@@ -198,8 +198,8 @@ elif false:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(1, interpreter.root_environment.get('a'))
 
@@ -213,8 +213,8 @@ while a < 10:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(10, interpreter.root_environment.get('a'))
 
@@ -228,8 +228,8 @@ for i = 0; i < 10; i = i + 1:
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(2 ** 10, interpreter.root_environment.get('a'))
 
@@ -244,8 +244,8 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(10, interpreter.root_environment.get('a'))
 
@@ -261,8 +261,8 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(45, interpreter.root_environment.get('a'))
 
@@ -281,8 +281,8 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(4*3*2*1, interpreter.root_environment.get('a'))
 
@@ -298,8 +298,8 @@ result = fn(4)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(4*3*2*1, interpreter.root_environment.get('result'))
 
@@ -317,8 +317,8 @@ result = ack(2, 2)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(7, interpreter.root_environment.get('result'))
 
@@ -336,8 +336,8 @@ result = ack(1, 2)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         # Expected ack(1,2) = ack(0, ack(1,0)) then ack(1,1) = ack(0, ack(1,0)) = ack(0,2) = 3, 
         # so ack(1,2) = ack(0,3)=4
