@@ -251,7 +251,20 @@ class Parser:
             return number
 
         if self._current_token.type == TokenType.STRING:
-            string = String(self._current_token, self._current_token.literal)
+            literal = self._current_token.literal
+            # Handle triple quotes
+            if literal.startswith('"""') and literal.endswith('"""'):
+                string_content = literal[3:-3]
+            # Handle single quotes
+            elif literal.startswith('"') and literal.endswith('"'):
+                string_content = literal[1:-1]
+            else:
+                self.errors.append(f"Invalid string format at position {self._current_token.pos}")
+                return None
+
+            # Process escape sequences
+            string_content = self._process_escape_sequences(string_content)
+            string = String(self._current_token, string_content)
             self._advance_token()
             return string
 
@@ -268,6 +281,34 @@ class Parser:
         
         self._expect_one_of([TokenType.IDENTIFIER, TokenType.NUMBER, TokenType.STRING, TokenType.BOOLEAN, TokenType.FLOAT])
         return None
+
+    def _process_escape_sequences(self, s: str) -> str:
+        """Process common escape sequences in strings."""
+        escape_sequences = {
+            r'\n': '\n',    # newline
+            r'\t': '\t',    # tab
+            r'\r': '\r',    # carriage return
+            r'\"': '"',     # quote
+            r'\\': '\\',    # backslash
+            r'\b': '\b',    # backspace
+            r'\f': '\f',    # form feed
+        }
+        result = ''
+        i = 0
+        while i < len(s):
+            if s[i] == '\\' and i + 1 < len(s):
+                escape_seq = s[i:i+2]
+                if escape_seq in escape_sequences:
+                    result += escape_sequences[escape_seq]
+                    i += 2
+                else:
+                    # Invalid escape sequence - keep it as is
+                    result += escape_seq
+                    i += 2
+            else:
+                result += s[i]
+                i += 1
+        return result
 
     def _parse_function_call(self) -> Optional[Expression]:
         token = self._current_token

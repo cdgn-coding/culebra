@@ -1,0 +1,15 @@
+a = 1
+n = 5
+while n > 0:
+    a = a * n
+    n = n - 1
+result = a
+print("5! =", result)
+
+a = 0
+for i = 0; i < 5; i = i + 1:
+    for j = 0; j < 5; j = j + 1:
+        a = a + 1
+result = a
+
+print("5x5 =", result)

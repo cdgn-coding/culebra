@@ -20,8 +20,8 @@ result = fib(7)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(13, interpreter.root_environment.get('result'))
 
@@ -39,8 +39,8 @@ result = a
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(25, interpreter.root_environment.get('result'))
 
@@ -59,8 +59,8 @@ result = a
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(120, interpreter.root_environment.get('result'))
 
@@ -78,8 +78,8 @@ result = power(2, 8)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(256, interpreter.root_environment.get('result'))
 
@@ -110,8 +110,8 @@ result = a0 * 1000 + a1 * 100 + a2 * 10 + a3
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(4557, interpreter.root_environment.get('result'))
 
@@ -130,7 +130,7 @@ result = apply_twice(increment, 3)
         parser = Parser(sequence)
         program = parser.parse()
 
-        interpreter = Interpreter(program)
-        interpreter.evaluate()
+        interpreter = Interpreter()
+        interpreter.evaluate(program)
 
         self.assertEqual(5, interpreter.root_environment.get('result'))

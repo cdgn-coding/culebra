@@ -1,74 +1,194 @@
 from culebra import ast
-from culebra.interpreter import evaluation_tree
 from culebra.interpreter.environment import Environment
-from culebra.interpreter.evaluation_tree import Identifier, Evaluable
+from culebra.token import TokenType
 
+# Create a custom exception for function returns.
+class ReturnValue(Exception):
+    def __init__(self, value):
+        self.value = value
+
+# Function object stores the function definition with its closure.
+class Function:
+    def __init__(self, name, arguments, body, closure):
+        self.name = name
+        self.arguments = arguments  # list of parameter names
+        self.body = body            # AST node representing the function body
+        self.closure = closure      # environment at the time of definition
+
+    def call(self, interpreter, arguments):
+        # Create a child environment for the function execution.
+        function_env = self.closure.create_child()
+        for arg_name, arg_value in zip(self.arguments, arguments):
+            function_env.assign(arg_name, arg_value)
+        try:
+            interpreter.eval_node(self.body, function_env)
+        except ReturnValue as rv:
+            return rv.value
+        return None
+
+##############################
+# Built-in function wrapper and definitions
+##############################
+
+class BuiltinFunction:
+    def __init__(self, func):
+        self.func = func
+
+    def call(self, interpreter, arguments):
+        return self.func(*arguments)
+
+def builtin_print(*args):
+    print(*args)
+    return None
+
+def builtin_input(prompt=""):
+    return input(prompt)
+
+def builtin_len(x):
+    return len(x)
 
 class Interpreter:
-    def __init__(self, program: ast.Program):
-        self.program = program
+    def __init__(self):
         self.root_environment = Environment()
-        self.tree = self.__build_tree(self.program)
+        self.load_builtins()  # Load built-in functions into the environment
 
-    def evaluate(self):
-        return self.tree.evaluate(self.root_environment)
+    def evaluate(self, program: ast.Program):
+        return self.eval_node(program, self.root_environment)
 
-    def __build_tree(self, node: ast.ASTNode) -> evaluation_tree.Evaluable:
+    def eval_node(self, node, environment):
+        # Dispatch evaluation based on the type of AST node.
         if isinstance(node, ast.Identifier):
-            name = node.value
-            token = node.token
-            return evaluation_tree.Identifier(name, token)
-        if isinstance(node, ast.Assignment):
-            token = node.token
-            identifier = Identifier(node.identifier.value, node.identifier.token)
-            value = self.__build_tree(node.value)
-            return evaluation_tree.Assignment(identifier, value, token)
-        if isinstance(node, ast.LiteralValue):
-            return evaluation_tree.Literal(node.value, node.token)
-        if isinstance(node, (ast.Program, ast.Block)):
-            statements = [self.__build_tree(node) for node in node.statements]
-            return  evaluation_tree.Block(statements)
-        if isinstance(node, ast.BinaryOperation):
-            token = node.token
-            left = self.__build_tree(node.left)
-            right = self.__build_tree(node.right)
-            return evaluation_tree.BinaryOperation(left, right, token)
-        if isinstance(node, ast.PrefixOperation):
-            token = node.token
-            expression = self.__build_tree(node.value)
-            return evaluation_tree.UnaryOperation(expression, token)
-        if isinstance(node, ast.Conditional):
-            token = node.token
-            condition = self.__build_tree(node.condition)
-            body = self.__build_tree(node.body)
-            otherwise = None if not node.otherwise else self.__build_tree(node.otherwise)
-            return evaluation_tree.Conditional(condition, body, otherwise, token)
-        if isinstance(node, ast.While):
-            token = node.token
-            condition = self.__build_tree(node.condition)
-            body = self.__build_tree(node.body)
-            return evaluation_tree.While(condition, body, token)
-        if isinstance(node, ast.For):
-            token = node.token
-            condition = self.__build_tree(node.condition)
-            body = self.__build_tree(node.body)
-            pre = self.__build_tree(node.pre)
-            post = self.__build_tree(node.post)
-            return evaluation_tree.For(condition, body, pre, post, token)
-        if isinstance(node, ast.FunctionDefinition):
-            token = node.token
-            body = self.__build_tree(node.body)
-            arguments = [arg.value for arg in node.arguments]
-            name = node.name.value
-            return evaluation_tree.Function(name, arguments, body, token)
-        if isinstance(node, ast.FunctionCall):
-            token = node.token
-            name = node.function.value
-            arguments = [self.__build_tree(arg) for arg in node.arguments]
-            return evaluation_tree.FunctionCall(name, arguments, token)
-        if isinstance(node, ast.ReturnStatement):
-            token = node.token
-            expression = self.__build_tree(node.value)
-            return evaluation_tree.Return(expression, token)
+            return self.evaluate_identifier(node, environment)
+        elif isinstance(node, ast.Assignment):
+            return self.evaluate_assignment(node, environment)
+        elif isinstance(node, ast.LiteralValue):
+            return self.evaluate_literal(node, environment)
+        elif isinstance(node, (ast.Program, ast.Block)):
+            return self.evaluate_block(node, environment)
+        elif isinstance(node, ast.BinaryOperation):
+            return self.evaluate_binary_operation(node, environment)
+        elif isinstance(node, ast.PrefixOperation):
+            return self.evaluate_prefix_operation(node, environment)
+        elif isinstance(node, ast.Conditional):
+            return self.evaluate_conditional(node, environment)
+        elif isinstance(node, ast.While):
+            return self.evaluate_while(node, environment)
+        elif isinstance(node, ast.For):
+            return self.evaluate_for(node, environment)
+        elif isinstance(node, ast.FunctionDefinition):
+            return self.evaluate_function_definition(node, environment)
+        elif isinstance(node, ast.FunctionCall):
+            return self.evaluate_function_call(node, environment)
+        elif isinstance(node, ast.ReturnStatement):
+            return self.evaluate_return(node, environment)
+        else:
+            raise TypeError(f"Unexpected AST node type: {type(node)}")
 
-        raise TypeError(f"Unexpected type {type(node)}")
+    def evaluate_identifier(self, node, environment):
+        # AST Identifier: node.value holds the variable name.
+        return environment.get(node.value)
+
+    def evaluate_assignment(self, node, environment):
+        # Evaluate the value and assign it to the variable in the current environment.
+        value = self.eval_node(node.value, environment)
+        environment.assign(node.identifier.value, value)
+        return None
+
+    def evaluate_literal(self, node, environment):
+        return node.value
+
+    def evaluate_block(self, node, environment):
+        result = None
+        for stmt in node.statements:
+            result = self.eval_node(stmt, environment)
+        return result
+
+    def evaluate_binary_operation(self, node, environment):
+        left = self.eval_node(node.left, environment)
+        right = self.eval_node(node.right, environment)
+        tt = node.token.type
+
+        # Arithmetic
+        if tt == TokenType.PLUS:
+            return left + right
+        elif tt == TokenType.MINUS:
+            return left - right
+        elif tt == TokenType.MUL:
+            return left * right
+        elif tt == TokenType.DIV:
+            return left / right
+
+        # Comparison
+        elif tt == TokenType.EQUAL:
+            return left == right
+        elif tt == TokenType.NOT_EQUAL:
+            return left != right
+        elif tt == TokenType.LESS:
+            return left < right
+        elif tt == TokenType.GREATER:
+            return left > right
+        elif tt == TokenType.LESS_EQ:
+            return left <= right
+        elif tt == TokenType.GREATER_EQ:
+            return left >= right
+
+        # Logical
+        elif tt == TokenType.OR:
+            return left or right
+        elif tt == TokenType.AND:
+            return left and right
+
+        raise AssertionError(f"Unexpected binary operation token {node.token}")
+
+    def evaluate_prefix_operation(self, node, environment):
+        operand = self.eval_node(node.value, environment)
+        tt = node.token.type
+        if tt == TokenType.MINUS:
+            return -operand
+        elif tt == TokenType.NOT:
+            return not operand
+        raise AssertionError(f"Unexpected prefix operation token {node.token}")
+
+    def evaluate_conditional(self, node, environment):
+        condition = self.eval_node(node.condition, environment)
+        if condition:
+            return self.eval_node(node.body, environment)
+        elif node.otherwise:
+            return self.eval_node(node.otherwise, environment)
+        return None
+
+    def evaluate_while(self, node, environment):
+        while self.eval_node(node.condition, environment):
+            self.eval_node(node.body, environment)
+        return None
+
+    def evaluate_for(self, node, environment):
+        self.eval_node(node.pre, environment)
+        while self.eval_node(node.condition, environment):
+            self.eval_node(node.body, environment)
+            self.eval_node(node.post, environment)
+        return None
+
+    def evaluate_function_definition(self, node, environment):
+        name = node.name.value
+        arguments = [arg.value for arg in node.arguments]
+        function = Function(name, arguments, node.body, environment)
+        environment.assign(name, function)
+        return None
+
+    def evaluate_function_call(self, node, environment):
+        function_obj = environment.get(node.function.value)
+        if not hasattr(function_obj, "call"):
+            raise Exception(f"{node.function.value} is not callable")
+        evaluated_args = [self.eval_node(arg, environment) for arg in node.arguments]
+        return function_obj.call(self, evaluated_args)
+
+    def evaluate_return(self, node, environment):
+        value = self.eval_node(node.value, environment)
+        raise ReturnValue(value)
+
+    def load_builtins(self):
+        # Add built-in functions to the global environment.
+        self.root_environment.assign("print", BuiltinFunction(builtin_print))
+        self.root_environment.assign("input", BuiltinFunction(builtin_input))
+        self.root_environment.assign("len", BuiltinFunction(builtin_len))
