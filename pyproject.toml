@@ -1,14 +1,22 @@
-[project]
-name = "culebra"
-version = "0.0.1"
-description = "Lenguaje de programación experimental"
-authors = [{ name = "Carlos Nexans" }]
-dependencies = []
-
-[project.scripts]
-culebra-repl = "culebra.repl:main"
-culebra = "culebra.interpreter:main"
-
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "culebra"
+version = "0.1.0"
+description = "A REPL for the Culebra language"
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/cdgn-coding/culebra"
+
+[project.scripts]
+culebra-repl = "culebra.repl:main"
+culebra = "culebra.interpreter.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
