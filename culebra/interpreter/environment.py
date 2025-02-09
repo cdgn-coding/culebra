@@ -1,5 +1,51 @@
 from typing import Optional
 
+"""
+Culebra Scoping Implementation
+=============================
+
+Function-Based Scoping Model:
+┌─────────────────────────────────────┐
+│ Global Environment                  │
+│ ┌─────────────────────────────────┐ │
+│ │ Function Environment            │ │
+│ │   variables: {...}              │ │
+│ │   parent: ↑                     │ │
+│ │                                 │ │
+│ │   if/while/for blocks           │ │
+│ │   share function's scope        │ │
+│ └─────────────────────────────────┘ │
+│     variables: {...}                │
+│     parent: None                    │
+└─────────────────────────────────────┘
+
+Variable Resolution:
+1. Check current environment
+2. If not found, check parent
+3. Continue up chain until found or error
+
+
+Scope Example:
+┌────────────────┐  ┌─────────────────────┐
+│     Code       │  │      Scopes         │
+├────────────────┤  ├─────────────────────┤
+│ x = 1          │  │ Global: {x: 1}      │
+│ def foo():     │  │   ↓                 │
+│   y = 2        │  │ Foo: {y: 2, z: 3}   │
+│   if True:     │  │   (blocks share     │
+│     z = 3      │  │    function scope)  │
+│   return y+z   │  │                     │
+└────────────────┘  └─────────────────────┘
+
+Features:
+- Function-level scope: New environment only for functions
+- Block statements (if/while/for) share their function's scope
+- Lexical resolution: Functions retain their definition environment
+- Variable shadowing: Inner function scope can hide outer variables
+- Dynamic assignment: Can modify outer scope variables
+- Closure support: Inner functions capture outer scope
+"""
+
 class Environment:
     def __init__(self, parent: Optional['Environment'] = None):
         self.values: dict[str, any] = {}

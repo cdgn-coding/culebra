@@ -2,33 +2,157 @@ from culebra.ast import *
 from culebra.token import Token, TokenType
 
 """
-program -> statement*
-statement -> assignment | if_statement | while_statement | for_statement | function_def | return_statement | expression
-assignment -> identifier "=" expression
+Culebra Language Grammar and Parser Implementation
+================================================
 
-expression -> logical_expr
-logical_expr -> comparison_expr (("and" | "or") comparison_expr)*
-comparison_expr -> arithmetic_expr ((">" | "<" | ">=" | "<=" | "==" | "!=") arithmetic_expr)*
-arithmetic_expr -> term (("+" | "-") term)*
-term -> factor (("*" | "/") factor)*
-factor -> unary_expr | elemental_expr
-unary_expr -> ("-") elemental_expr
-elemental_expr -> identifier | literal | "(" expression ")" | function_call | array_literal | map_literal | set_literal
+The Culebra parser implements a **recursive descent approach** to process the language's 
+grammar and generate an Abstract Syntax Tree (AST). It follows a **top-down parsing strategy**, 
+where each grammar rule corresponds to a dedicated `_parse_*` method.
 
-literal -> NUMBER | STRING | BOOLEAN | NULL
-array_literal -> "[" (expression ("," expression)*)? "]"
-map_literal -> "{" (STRING ":" expression ("," STRING ":" expression)*)? "}"
-set_literal -> "{" (expression ("," expression)*)? "}"
+Recursive Descent Parser Flow:
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Program   │ ──> │ Statements  │ ──> │ Statement   │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                              │
+                    ┌──────────────────┬──────┴───────┬─────────────┐
+                    ▼                  ▼              ▼             ▼
+            ┌─────────────┐    ┌────────────┐  ┌──────────┐  ┌──────────┐
+            │ Assignment  │    │ Expression │  │ Function │  │   Flow   │
+            └─────────────┘    └────────────┘  └──────────┘  └──────────┘
+                                     │                            │
+                                     ▼                      ┌─────┴─────┐
+                    Expression Precedence Hierarchy         ▼           ▼
+                    ┌──────────────────────────────┐   ┌───────┐   ┌───────┐
+                    │   Logical (and/or)           │   │  If   │   │ Loop  │
+                    │   Comparison (>,<,>=,<=,==)  │   └───────┘   └───────┘
+                    │   Arithmetic (+,-)           │
+                    │   Term (*,/)                 │
+                    │   Factor                     │
+                    │   Unary (-,not)              │
+                    │   Elemental                  │
+                    └──────────────────────────────┘
 
-function_call -> identifier "(" (expression ("," expression)*)? ")"
-function_def -> "def" identifier "(" (identifier ("," identifier)*)? ")" ":" block
+The parser starts at the highest level (`Program`), which consists of multiple `Statement` nodes. 
+Each `Statement` may be an **assignment, function definition, control structure**, or an **expression**. 
+Expressions are parsed with operator precedence in mind, ensuring **correct evaluation order**.
 
-if_statement -> "if" expression ":" block ("elif" expression ":" block)* ("else" ":" block)?
-while_statement -> "while" expression ":" block
-for_statement -> "for" assignment ";" expression ";" assignment ":" block
+Program
+ ├── Statement
+ │    ├── Assignment
+ │    │    ├── Identifier
+ │    │    ├── "="
+ │    │    └── Expression
+ │    ├── FunctionDef
+ │    │    ├── "def"
+ │    │    ├── Identifier
+ │    │    ├── "(" Parameters? ")"
+ │    │    ├── ":"
+ │    │    └── Block
+ │    ├── ReturnStatement
+ │    │    ├── "return"
+ │    │    └── Expression
+ │    ├── IfStatement
+ │    │    ├── "if" Expression ":" Block
+ │    │    ├── ("elif" Expression ":" Block)*
+ │    │    ├── ("else" ":" Block)?
+ │    │    └── Block
+ │    ├── WhileStatement
+ │    │    ├── "while" Expression ":" Block
+ │    │    └── Block
+ │    ├── ForStatement
+ │    │    ├── "for" Assignment ";" Expression ";" Assignment ":" Block
+ │    │    └── Block
+ │    ├── Expression
+ │    │    ├── LogicalExpr
+ │    │    │    ├── ComparisonExpr (("and" | "or") ComparisonExpr)*
+ │    │    │    └── ComparisonExpr
+ │    │    ├── ArithmeticExpr
+ │    │    │    ├── Term (("+" | "-") Term)*
+ │    │    │    └── Term
+ │    │    ├── Term
+ │    │    │    ├── Factor (("*" | "/") Factor)*
+ │    │    │    └── Factor
+ │    │    ├── Factor
+ │    │    │    ├── UnaryExpr | ElementalExpr
+ │    │    │    └── UnaryExpr
+ │    │    ├── UnaryExpr
+ │    │    │    ├── ("-" | "not") ElementalExpr
+ │    │    │    └── ElementalExpr
+ │    │    ├── ElementalExpr
+ │    │    │    ├── Identifier
+ │    │    │    ├── Literal
+ │    │    │    ├── "(" Expression ")"
+ │    │    │    └── FunctionCall
+ │    │    └── FunctionCall
+ │    │         ├── Identifier "(" (Expression ("," Expression)*)? ")"
+ │    │         └── Expression
+ │    └── Block
+ │         ├── INDENT
+ │         ├── Statement+
+ │         └── DEDENT
 
-block -> INDENT statement+ DEDENT
-return_statement -> "return" expression?
+==================================
+Expression example
+==================================
+
+Expression: `1 + 2 * 3`
+-----------------------
+    (+)
+   /   \
+ (1)    (*)
+       /   \
+     (2)   (3)
+
+Explanation:
+------------
+- The parser first evaluates `2 * 3` due to operator precedence.
+- The result of `2 * 3` is then added to `1`.
+- The AST represents this order of operations correctly.
+                    
+==================================
+Complete Grammar Definition
+==================================
+
+Program         ::= Statement*
+
+Statement       ::= Assignment
+                 | FunctionDef
+                 | ReturnStatement
+                 | IfStatement
+                 | WhileStatement
+                 | ForStatement
+                 | Expression
+
+Assignment      ::= Identifier "=" Expression
+
+Expression      ::= LogicalExpr
+LogicalExpr     ::= ComparisonExpr (("and" | "or") ComparisonExpr)*
+ComparisonExpr  ::= ArithmeticExpr ((">" | "<" | ">=" | "<=" | "==" | "!=") ArithmeticExpr)*
+ArithmeticExpr  ::= Term (("+" | "-") Term)*
+Term            ::= Factor (("*" | "/") Factor)*
+Factor          ::= UnaryExpr | ElementalExpr
+UnaryExpr       ::= ("-" | "not") ElementalExpr
+ElementalExpr   ::= Identifier
+                 | Literal
+                 | "(" Expression ")"
+                 | FunctionCall
+
+Literal         ::= NUMBER | STRING | BOOLEAN | FLOAT | NULL
+FunctionCall    ::= Identifier "(" (Expression ("," Expression)*)? ")"
+FunctionDef     ::= "def" Identifier "(" (Identifier ("," Identifier)*)? ")" ":" Block
+
+IfStatement     ::= "if" Expression ":" Block ("elif" Expression ":" Block)* ("else" ":" Block)?
+WhileStatement  ::= "while" Expression ":" Block
+ForStatement    ::= "for" Assignment ";" Expression ";" Assignment ":" Block
+
+Block           ::= INDENT Statement+ DEDENT
+ReturnStatement ::= "return" Expression
+
+Notes:
+- Each rule maps directly to a _parse_* method in the Parser class
+- The parser uses recursive descent with operator precedence for expressions
+- INDENT/DEDENT tokens are generated by the lexer for block structure
+- Error handling includes synchronization and detailed error messages
 """
 
 ComparisonOperators = {

@@ -1,5 +1,79 @@
 #!/usr/bin/env python3
 
+"""
+Lexer: Converts source text into a sequence of tokens
+
+Process:
+┌──────────────┐
+│  Input Text  │ "if x > 5:\n    print('hello')"
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐  Matches against regex patterns:
+│  Tokenizer   │  • Keywords (if, else, while...)
+│   Process    │  • Operators (+, -, *, /, >, <...)
+│              │  • Literals (numbers, strings...)
+└──────┬───────┘  • Special chars ({, }, (, )...)
+       │
+       ▼
+┌──────────────┐  [
+│   Tokens     │   Token(IF, "if", pos=0),
+│    List      │   Token(IDENTIFIER, "x", pos=3),
+│              │   Token(GREATER, ">", pos=5),
+└──────────────┘   Token(NUMBER, "5", pos=7),
+                   ...
+                 ]
+
+Indentation Handling:
+└─ Level 0    if x > 5:
+   └─ Level 1     print('hello')  # INDENT token added
+                                 # DEDENT token added at end
+
+Indentation Stack Example:
+┌─────────────┐  ┌──────────────┐
+│ Source Code │  │ Indent Stack │
+├─────────────┤  ├──────────────┤
+│ def foo():  │  │ [0]          │
+│   if x:     │  │ [0,4]        │
+│     print() │  │ [0,4,8]      │
+│   else:     │  │ [0,4]        │
+│     print() │  │ [0,4,8]      │
+│   print()   │  │ [0,4]        │
+│ print()     │  │ [0]          │
+└─────────────┘  └──────────────┘
+
+Stack Operations:
+• Stack always starts with [0]
+• INDENT: Push new level when indent increases
+• DEDENT: Pop levels when indent decreases
+• Multiple DEDENTs may be generated for one line
+• Final DEDENTs generated at EOF if needed
+• Error if indent doesn't match any previous level
+
+Generated Tokens Include:
+INDENT  - When pushing new level
+DEDENT  - When popping levels
+NEWLINE - At end of each line
+
+Token Matching Algorithm:
+• Uses Maximal Munch (Longest Match) principle
+• Tries patterns in order of precedence:
+  1. Whitespace and comments
+  2. Keywords (to prevent 'if' being tokenized as identifier)
+  3. Multi-character operators (==, >=, <=)
+  4. Single-character operators and delimiters
+  5. Invalid identifiers (for error reporting)
+  6. Numbers and literals
+  7. Valid identifiers
+
+Special Features:
+• Tracks position of each token for error reporting
+• Manages indentation with INDENT/DEDENT tokens
+• Handles comments and whitespace
+• Validates identifier names
+• Supports multi-line strings
+"""
+
 from typing import List
 import re
 from culebra.token import Token, TokenType

@@ -2,6 +2,80 @@ from culebra import ast
 from culebra.interpreter.environment import Environment
 from culebra.token import TokenType
 
+"""
+Culebra Interpreter Implementation
+================================
+
+Execution Model:
+┌─────────────────────────────────────────────────────────────────┐
+│                        Interpreter                              │
+│  ┌─────────────┐    ┌────────────┐    ┌──────────────────┐      │
+│  │    AST      │ -> │ Evaluator  │ -> │    Runtime       │      │
+│  │   Nodes     │    │  Methods   │    │   Environment    │      │
+│  └─────────────┘    └────────────┘    └──────────────────┘      │
+│         │                 │                    │                │
+│     Programs        visit_methods          Variables            │
+│    Statements       Expressions             Functions           │
+│    Expressions      Operations             Call Stack           │
+└─────────────────────────────────────────────────────────────────┘
+
+Environment Stack:
+┌────────────────┐    ┌─────────────────────┐
+│  Call Frames   │    │    Scope Example    │
+├────────────────┤    ├─────────────────────┤
+│  Global Scope  │    │ def foo(x):         │
+│  Function foo  │    │   y = 2             │
+│  Function bar  │    │   def bar():        │
+└────────────────┘    │     return x + y    │
+        ▲             │   return bar()      │
+        │             └─────────────────────┘
+        └── Each frame contains its own symbol table
+
+Memory Model:
+┌──────────────────────┐
+│   Runtime Memory     │
+├──────────────────────┤
+│ ┌────────────────┐   │    ┌─────────────────┐
+│ │  Value Stack   │   │    │  Value Types    │
+│ ├────────────────┤   │    ├─────────────────┤
+│ │ Temp Results   │   │    │ Number          │
+│ │ Function Args  │   │    │ String          │
+│ │ Return Values  │   │    │ Boolean         │
+│ └────────────────┘   │    │ Function        │
+│                      │    │ None            │
+│ ┌────────────────┐   │    └─────────────────┘
+│ │ Symbol Tables  │   │
+│ ├────────────────┤   │
+│ │ Variables      │   │
+│ │ Functions      │   │
+│ └────────────────┘   │
+└──────────────────────┘
+
+Execution Flow:
+┌─────────┐   ┌─────────┐   ┌──────────┐   ┌──────────┐
+│   AST   │   │ Visit   │   │ Evaluate │   │ Update   │
+│  Node   │-->│ Method  │-->│ Children │-->│  State   │
+└─────────┘   └─────────┘   └──────────┘   └──────────┘
+
+Error Handling:
+┌────────────────────┐   ┌────────────────────┐
+│  Runtime Errors    │   │   Error Types      │
+├────────────────────┤   ├────────────────────┤
+│ Type Mismatches    │   │ TypeError          │
+│ Undefined Names    │   │ NameError          │
+│ Division by Zero   │   │ ZeroDivisionError  │
+│ Stack Overflow     │   │ RuntimeError       │
+└────────────────────┘   └────────────────────┘
+
+Implementation Notes:
+- Visitor pattern used to traverse and evaluate AST nodes
+- Environment maintains lexical scoping through stack-based frames
+- Each function call creates a new environment frame
+- Variables and functions stored in symbol tables
+- Runtime errors include stack traces and line numbers
+- Built-in functions implemented as native Python callables
+"""
+
 # Create a custom exception for function returns.
 class ReturnValue(Exception):
     def __init__(self, value):
