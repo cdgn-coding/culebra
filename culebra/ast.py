@@ -294,3 +294,16 @@ class For(Statement):
     @property
     def children(self) -> List['ASTNode']:
         return [self.condition, self.pre, self.condition, self.post]
+
+class BracketAccess(Expression):
+    def __init__(self, token: Token, target: Expression, index: Expression):
+        super().__init__(token)
+        self.target = target
+        self.index = index
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.target}, {self.index})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.target, self.index]

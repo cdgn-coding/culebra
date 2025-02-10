@@ -164,6 +164,8 @@ class Interpreter:
                 return self.evaluate_function_call(node, environment)
             elif isinstance(node, ast.ReturnStatement):
                 return self.evaluate_return(node, environment)
+            elif isinstance(node, ast.BracketAccess):
+                return self.evaluate_bracket_access(node, environment)
             else:
                 raise TypeError(f"Unexpected AST node type: {type(node)}")
         except Exception as e:
@@ -274,6 +276,24 @@ class Interpreter:
     def evaluate_return(self, node, environment):
         value = self.eval_node(node.value, environment)
         raise ReturnValue(value)
+
+    def evaluate_bracket_access(self, node, environment):
+        target = self.eval_node(node.target, environment)
+        index = self.eval_node(node.index, environment)
+        
+        # Ensure index is an integer
+        if not isinstance(index, int):
+            raise TypeError(f"String index must be an integer, got {type(index)}")
+        
+        # For now, we only support string indexing
+        if not isinstance(target, str):
+            raise TypeError(f"Bracket access currently only supports strings, got {type(target)}")
+        
+        # Check index bounds
+        if index < 0 or index >= len(target):
+            raise IndexError(f"String index {index} out of range for string of length {len(target)}")
+        
+        return target[index]
 
     def load_builtins(self):
         # Add built-in functions to the global environment.

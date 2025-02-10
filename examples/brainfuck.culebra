@@ -1,0 +1,66 @@
+def find_matching_bracket(current_pos, direction):
+    count = 0
+    if direction > 0:
+        char_open = "["
+        char_close = "]"
+    else:
+        char_open = "]"
+        char_close = "["
+    pos = current_pos + direction
+    while pos >= 0 and pos < len(code):
+        if code[pos] == char_open:
+            count = count + 1
+        elif code[pos] == char_close:
+            count = count - 1
+            if count < 0:
+                return pos
+        pos = pos + direction
+    return -1
+
+def brainfuck(code):
+    tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    pointer = 0
+    output = ""
+    code_pos = 0
+
+    while code_pos < len(code):
+        command = code[code_pos]
+
+        if command == ">":
+            pointer = pointer + 1
+            if pointer >= len(tape):
+                pointer = 0
+        elif command == "<":
+            pointer = pointer - 1
+            if pointer < 0:
+                pointer = len(tape) - 1
+        elif command == "+":
+            tape[pointer] = tape[pointer] + 1
+            if tape[pointer] > 255:
+                tape[pointer] = 0
+        elif command == "-":
+            tape[pointer] = tape[pointer] - 1
+            if tape[pointer] < 0:
+                tape[pointer] = 255
+        elif command == ".":
+            # Convert number to character and append to output
+            output = output + chr(tape[pointer])
+        elif command == "[":
+            if tape[pointer] == 0:
+                code_pos = find_matching_bracket(code_pos, 1)
+                if code_pos < 0:
+                    return "Error: Unmatched ["
+        elif command == "]":
+            if tape[pointer] != 0:
+                code_pos = find_matching_bracket(code_pos, -1)
+                if code_pos < 0:
+                    return "Error: Unmatched ]"
+
+        code_pos = code_pos + 1
+
+    return output
+
+# Test the interpreter with "Hello, World!"
+program = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
+
+result = brainfuck(program)
