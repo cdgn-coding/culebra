@@ -430,6 +430,22 @@ tape = [0,0,0,0]
 """
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
-        _ = parser.parse()
+        program = parser.parse()
         self.assertEqual(False, parser.has_error)
-        raise NotImplementedError("Not implemented yet")
+        expected = 'Assignment(Identifier(tape), Array([Integer(0), Integer(0), Integer(0), Integer(0)]))'
+        self.assertEqual(expected, repr(program))
+
+    def test_array_literals(self):
+        test_cases = [
+            ("[1,2,3]", "Array([Integer(1), Integer(2), Integer(3)])"),
+            ("[]", "Array([])"),
+            ("[1.0, true, \"hello\"]", "Array([Float(1.0), Bool(True), String(hello)])"),
+            ("[[1,2],[3,4]]", "Array([Array([Integer(1), Integer(2)]), Array([Integer(3), Integer(4)])])")
+        ]
+
+        for source, expected in test_cases:
+            sequence = Lexer().tokenize(source)
+            parser = Parser(sequence)
+            program = parser.parse()
+            self.assertEqual(False, parser.has_error)
+            self.assertEqual(expected, repr(program.statements[0]))

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from culebra.token import Token, TokenType
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 class ASTNode(ABC):
@@ -92,8 +92,21 @@ class Identifier(LiteralValue[str]):
     def __init__(self, token: Token, value: str):
         super().__init__(token, value)
 
+class BracketAccess(Expression):
+    def __init__(self, token: Token, target: Expression, index: Expression):
+        super().__init__(token)
+        self.target = target
+        self.index = index
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}({self.target}, {self.index})"
+
+    @property
+    def children(self) -> List['ASTNode']:
+        return [self.target, self.index]
+
 class Assignment(Statement):
-    def __init__(self, token: Token, identifier: Identifier, value: Expression):
+    def __init__(self, token: Token, identifier: Union[Identifier, BracketAccess], value: Expression):
         super().__init__(token)
         self.identifier = identifier
         self.value = value
@@ -295,15 +308,15 @@ class For(Statement):
     def children(self) -> List['ASTNode']:
         return [self.condition, self.pre, self.condition, self.post]
 
-class BracketAccess(Expression):
-    def __init__(self, token: Token, target: Expression, index: Expression):
+class Array(Expression):
+    def __init__(self, token: Token, elements: List[Expression]):
         super().__init__(token)
-        self.target = target
-        self.index = index
+        self.elements = elements
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.target}, {self.index})"
+        elements_str = ", ".join(str(elem) for elem in self.elements)
+        return f"{self.node_name}([{elements_str}])"
 
     @property
     def children(self) -> List['ASTNode']:
-        return [self.target, self.index]
+        return self.elements

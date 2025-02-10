@@ -1,4 +1,4 @@
-def find_matching_bracket(current_pos, direction):
+def find_matching_bracket(current_pos, direction, code):
     count = 0
     if direction > 0:
         char_open = "["
@@ -22,10 +22,8 @@ def brainfuck(code):
     pointer = 0
     output = ""
     code_pos = 0
-
     while code_pos < len(code):
         command = code[code_pos]
-
         if command == ">":
             pointer = pointer + 1
             if pointer >= len(tape):
@@ -47,20 +45,19 @@ def brainfuck(code):
             output = output + chr(tape[pointer])
         elif command == "[":
             if tape[pointer] == 0:
-                code_pos = find_matching_bracket(code_pos, 1)
+                code_pos = find_matching_bracket(code_pos, 1, code)
                 if code_pos < 0:
                     return "Error: Unmatched ["
         elif command == "]":
             if tape[pointer] != 0:
-                code_pos = find_matching_bracket(code_pos, -1)
+                code_pos = find_matching_bracket(code_pos, -1, code)
                 if code_pos < 0:
                     return "Error: Unmatched ]"
-
         code_pos = code_pos + 1
-
     return output
 
 # Test the interpreter with "Hello, World!"
 program = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++."
 
 result = brainfuck(program)
+print(result)

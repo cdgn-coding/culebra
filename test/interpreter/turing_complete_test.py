@@ -155,16 +155,14 @@ def find_matching_bracket(current_pos, direction):
                 return pos
         pos = pos + direction
     return -1
-        
+
 def brainfuck(code):
     tape = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     pointer = 0
     output = ""
     code_pos = 0
-
     while code_pos < len(code):
         command = code[code_pos]
-
         if command == ">":
             pointer = pointer + 1
             if pointer >= len(tape):
@@ -194,9 +192,7 @@ def brainfuck(code):
                 code_pos = find_matching_bracket(code_pos, -1)
                 if code_pos < 0:
                     return "Error: Unmatched ]"
-
         code_pos = code_pos + 1
-
     return output
 
 # Test the interpreter with "Hello, World!"
@@ -208,7 +204,7 @@ result = brainfuck(program)
         parser = Parser(sequence)
         program = parser.parse()
 
-        self.assertEqual(False, parser.has_error)
+        self.assertEqual(False, parser.has_error, parser.last_error)
 
         interpreter = Interpreter()
         interpreter.evaluate(program)
