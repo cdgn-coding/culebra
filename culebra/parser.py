@@ -112,7 +112,6 @@ Explanation:
 ==================================
 Complete Grammar Definition
 ==================================
-
 Program         ::= Statement*
 
 Statement       ::= Assignment
@@ -123,7 +122,7 @@ Statement       ::= Assignment
                  | ForStatement
                  | Expression
 
-Assignment      ::= Identifier "=" Expression
+Assignment      ::= (Identifier | BracketAccess) "=" Expression
 
 Expression      ::= LogicalExpr
 LogicalExpr     ::= ComparisonExpr (("and" | "or") ComparisonExpr)*
@@ -136,6 +135,10 @@ ElementalExpr   ::= Identifier
                  | Literal
                  | "(" Expression ")"
                  | FunctionCall
+                 | BracketAccess
+                 | Array Literal
+BracketAccess   ::= (Identifier | BracketAccess) "[" Expression "]"
+Array Literal   ::= "[" Expression ("," Expression)* "]"
 
 Literal         ::= NUMBER | STRING | BOOLEAN | FLOAT | NULL
 FunctionCall    ::= Identifier "(" (Expression ("," Expression)*)? ")"
@@ -188,27 +191,43 @@ class Parser:
     def __init__(self, sequence: list[Token]):
         self.sequence = sequence
         self.index = 0
-        self.errors = []
+        self.last_error = None
+        self.last_token = None
 
     def parse(self) -> Program:
-        statements = []
-        while self._ignore_newlines() and self._has_token() and self._current_token.type != TokenType.EOF:
-            statement = self._parse_statement()
-            if statement is None:
-                self._advance_token()
-            else:
-                statements.append(statement)
+        try:
+            statements = []
+            while self._ignore_newlines() and self._has_token() and self._current_token.type != TokenType.EOF:
+                statement = self._parse_statement()
+                if statement is None:
+                    self._advance_token()
+                else:
+                    statements.append(statement)
 
+            return Program(statements)
+        except Exception as e:
+            if not self.has_error:
+                self.last_error = e
+                self.last_token = self._current_token
+            raise e
 
-        return Program(statements)
-    
+    @property
+    def has_error(self):
+        return self.last_error is not None
+
     def _parse_statement(self) -> Optional[Statement]:
         assert self._current_token is not None
         if self._current_token.type in [TokenType.NEWLINE, TokenType.EOF]:
             return None
 
-        if self._current_token.type == TokenType.IDENTIFIER and self._next_token.type == TokenType.ASSIGN:
-            return self._parse_assignment_statement()
+        if self._current_token.type == TokenType.IDENTIFIER:
+            start_index = self.index
+            target = self._parse_assignment_target()
+            if self._current_token is not None and self._current_token.type == TokenType.ASSIGN:
+                return self._parse_assignment_statement(target)
+            else:
+                # Not an assignment, so revert to the saved index.
+                self.index = start_index
 
         if self._current_token.type == TokenType.FUNCTION_DEFINITION:
             return self._parse_function_definition()
@@ -231,12 +250,7 @@ class Parser:
 
         self._expect_one_of([TokenType.IDENTIFIER, TokenType.FUNCTION_DEFINITION])
         
-    def _parse_assignment_statement(self) -> Optional[Assignment]:
-        # Parse identifier
-        assert self._current_token.type == TokenType.IDENTIFIER
-        identifier = Identifier(self._current_token, self._current_token.literal)
-        self._advance_token()
-
+    def _parse_assignment_statement(self, target: Expression) -> Optional[Assignment]:
         assert self._current_token.type == TokenType.ASSIGN
         assignment_token = self._current_token
         self._advance_token()
@@ -246,7 +260,7 @@ class Parser:
         if value is None:
             return None
 
-        return Assignment(assignment_token, identifier, value)
+        return Assignment(assignment_token, target, value)
 
     def _parse_expression(self) -> Optional[Expression]:
         expr = self._parse_logical_expression()
@@ -269,8 +283,11 @@ class Parser:
 
     def _expect_one_of(self, token_types: list[TokenType]) -> bool:
         if self._current_token.type not in token_types:
-            ls = ', '.join([t.name for t in token_types])
-            self.errors.append(f"Expected {ls}, got {self._current_token.type.name} instead in position {self._current_token.pos}")
+            if not self.has_error:
+                ls = ', '.join([t.name for t in token_types])
+                error = f"Expected {ls}, got {self._current_token.type.name} instead in position {self._current_token.pos}"
+                self.last_error = SyntaxError(error)
+                self.last_token = self._current_token
             return False
 
         return True
@@ -358,6 +375,9 @@ class Parser:
         return expr
 
     def _parse_elemental_expression(self) -> Optional[Expression]:
+        if self._current_token.type == TokenType.LBRACKET:
+            return self._parse_array_literal()
+
         if self._current_token.type == TokenType.LPAREN:
             return self._parse_parentheses_group_expression()
 
@@ -367,6 +387,9 @@ class Parser:
         if self._current_token.type == TokenType.IDENTIFIER:
             factor = Identifier(self._current_token, self._current_token.literal)
             self._advance_token()
+            # Check for bracket access
+            if self._current_token and self._current_token.type == TokenType.LBRACKET:
+                return self._parse_bracket_access(factor)
             return factor
 
         if self._current_token.type == TokenType.NUMBER:
@@ -390,6 +413,9 @@ class Parser:
             string_content = self._process_escape_sequences(string_content)
             string = String(self._current_token, string_content)
             self._advance_token()
+            # Check for bracket access
+            if self._current_token and self._current_token.type == TokenType.LBRACKET:
+                return self._parse_bracket_access(string)
             return string
 
         if self._current_token.type == TokenType.BOOLEAN:
@@ -648,3 +674,56 @@ class Parser:
 
         block = self._parse_block_statements()
         return block
+
+    def _parse_bracket_access(self, target: Expression) -> Optional[Expression]:
+        """Parse array/string index access with brackets."""
+        assert self._current_token.type == TokenType.LBRACKET
+        token = self._current_token
+        self._advance_token()
+
+        index = self._parse_expression()
+        if index is None:
+            return None
+
+        if not self._expect_one_of([TokenType.RBRACKET]):
+            return None
+        self._advance_token()
+
+        return BracketAccess(token, target, index)
+
+    def _parse_array_literal(self) -> Optional[Expression]:
+        """Parse array literals like [1, 2, 3]"""
+        assert self._current_token.type == TokenType.LBRACKET
+        token = self._current_token
+        self._advance_token()
+
+        elements = []
+        while self._current_token.type != TokenType.RBRACKET:
+            expr = self._parse_expression()
+            if expr is None:
+                return None
+            elements.append(expr)
+
+            if self._current_token.type in [TokenType.COMMA]:
+                self._advance_token()
+                continue
+
+            if not self._expect_one_of([TokenType.COMMA, TokenType.RBRACKET]):
+                return None
+
+        self._advance_token()
+        return Array(token, elements)
+
+    def _parse_assignment_target(self) -> Optional[Expression]:
+        # Only identifiers are valid as assignment base targets.
+        if self._current_token.type != TokenType.IDENTIFIER:
+            return None
+        target = Identifier(self._current_token, self._current_token.literal)
+        self._advance_token()
+
+        # Allow chain bracket access for assignment targets, e.g., mylist[0][1]
+        while self._has_token() and self._current_token.type == TokenType.LBRACKET:
+            target = self._parse_bracket_access(target)
+            if target is None:
+                return None
+        return target

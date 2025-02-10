@@ -80,3 +80,40 @@ class Environment:
 
     def create_child(self):
         return Environment(self)
+
+    def get_bracket(self, container: any, index: any) -> any:
+        """
+        Evaluate bracket access on a container.
+        Supports lists and strings.
+        """
+        if isinstance(container, list):
+            if not isinstance(index, int):
+                raise TypeError("List index must be an integer")
+            try:
+                return container[index]
+            except IndexError:
+                raise IndexError("List index out of range")
+        elif isinstance(container, str):
+            if not isinstance(index, int):
+                raise TypeError("String index must be an integer")
+            try:
+                return container[index]
+            except IndexError:
+                raise IndexError("String index out of range")
+        else:
+            raise TypeError("Bracket access not supported on type " + str(type(container)))
+
+    def assign_bracket(self, container: any, index: any, value: any) -> None:
+        """
+        Perform bracket assignment on a container.
+        Currently supports updating list elements.
+        """
+        if isinstance(container, list):
+            if not isinstance(index, int):
+                raise TypeError("List index must be an integer")
+            try:
+                container[index] = value
+            except IndexError:
+                raise IndexError("List index out of range")
+        else:
+            raise TypeError("Bracket assignment only supported on list, got " + str(type(container)))

@@ -158,7 +158,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         self.assertEqual('Assignment(Identifier(x), NegativeOperation(Integer(2)))', repr(program))
 
 
@@ -168,7 +168,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Assignment(Identifier(x), NegativeOperation(PlusOperation(Integer(2), NegativeOperation(Integer(2)))))'
         self.assertEqual(expected, repr(program))
 
@@ -178,7 +178,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Assignment(Identifier(x), NotOperation(Bool(True)))'
         self.assertEqual(expected, repr(program))
 
@@ -188,7 +188,7 @@ class TestParser(TestCase):
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), []))'
         self.assertEqual(expected, repr(program))
 
@@ -203,7 +203,7 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Assignment(Identifier(a), Integer(1))\nFunctionDefinition(Identifier(fn), [], [Assignment(Identifier(a), Integer(10))])\nFunctionCall(Identifier(fn), [])'
         self.assertEqual(expected, repr(program))
 
@@ -213,7 +213,7 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Assignment(Identifier(x), FunctionCall(Identifier(print), [Integer(1), Integer(2), Integer(3)]))'
         self.assertEqual(expected, repr(program))
 
@@ -223,7 +223,7 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual(['Expected COMMA, RPAREN, got NEWLINE instead in position 17'], parser.errors)
+        self.assertEqual('Expected COMMA, RPAREN, got NEWLINE instead in position 17', str(parser.last_error))
 
     def test_parentheses(self):
         source = "x = 2 * (1+1)"
@@ -231,7 +231,7 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual([], parser.errors)
+        self.assertEqual(None, parser.last_error)
         expected = 'Assignment(Identifier(x), MultiplicationOperation(Integer(2), PlusOperation(Integer(1), Integer(1))))'
         self.assertEqual(expected, repr(program))
 
@@ -241,16 +241,15 @@ fn()
         parser = Parser(sequence)
         program = parser.parse()
         self.assertTrue(isinstance(program, Program))
-        self.assertEqual(['Expected RPAREN, got NEWLINE instead in position 12'], parser.errors)
+        self.assertEqual('Expected RPAREN, got NEWLINE instead in position 12', str(parser.last_error))
 
     def test_expected_identifier_or_literal_error(self):
         source = "x = +"
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         _ = parser.parse()
-        self.assertEqual(1, len(parser.errors))
-        self.assertEqual(['Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got PLUS instead in position 4'], parser.errors)
 
+        self.assertEqual('Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got PLUS instead in position 4', str(parser.last_error))
     def test_function_definition(self):
         source = """
 def sum(x, y):
@@ -259,7 +258,7 @@ def sum(x, y):
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
         self.assertEqual(expected, repr(program))
 
@@ -274,7 +273,7 @@ def sum(x, y):
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'FunctionDefinition(Identifier(sum), [Identifier(x), Identifier(y)], [ReturnStatement(PlusOperation(Identifier(x), Identifier(y)))])'
         self.assertEqual(expected, repr(program))
 
@@ -286,7 +285,7 @@ if true:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
 
@@ -300,7 +299,7 @@ else:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]'
         self.assertEqual(expected, repr(program))
 
@@ -314,7 +313,7 @@ elif false:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(False)) Then [Identifier(pass)]]'
         self.assertEqual(expected, repr(program))
 
@@ -330,7 +329,7 @@ else:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)] Else [Conditional(Bool(True)) Then [Identifier(pass)]]]'
         self.assertEqual(expected, repr(program))
 
@@ -346,7 +345,7 @@ elif true:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         parser.parse()
-        self.assertEqual(8, len(parser.errors))
+        self.assertEqual('Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got ELIF instead in position 33', str(parser.last_error))
 
     def test_else_after_else(self):
         source = """
@@ -360,7 +359,7 @@ else:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         parser.parse()
-        self.assertEqual(8, len(parser.errors))
+        self.assertEqual('Expected IDENTIFIER, NUMBER, STRING, BOOLEAN, FLOAT, got ELSE instead in position 33', str(parser.last_error))
 
     def test_while(self):
         source = """
@@ -370,7 +369,7 @@ while true:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'While(Bool(True)) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
 
@@ -382,7 +381,7 @@ for i = 0; i < 10; i = i + 1:
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'For(Assignment(Identifier(i), Integer(0)); LessOperation(Identifier(i), Integer(10)); Assignment(Identifier(i), PlusOperation(Identifier(i), Integer(1)))) Then [Identifier(pass)]'
         self.assertEqual(expected, repr(program))
 
@@ -397,7 +396,7 @@ result = fn(4)
         sequence = Lexer().tokenize(source)
         parser = Parser(sequence)
         program = parser.parse()
-        self.assertEqual([], parser.errors)
+        self.assertEqual(False, parser.has_error)
         expected = 'FunctionDefinition(Identifier(fn), [Identifier(a)], [Conditional(GreaterOperation(Identifier(a), Integer(2))) Then [ReturnStatement(MultiplicationOperation(Identifier(a), FunctionCall(Identifier(fn), [MinusOperation(Identifier(a), Integer(1))])))], ReturnStatement(Identifier(a))])\nAssignment(Identifier(result), FunctionCall(Identifier(fn), [Integer(4)]))'
         self.assertEqual(expected, repr(program))
 
@@ -424,3 +423,29 @@ result = fn(4)
             string_literal = expr_stmt.value
             self.assertIsInstance(string_literal, str)
             self.assertEqual(string_literal, expected)
+
+    def test_assigment_of_array(self):
+        source = """
+tape = [0,0,0,0]
+"""
+        sequence = Lexer().tokenize(source)
+        parser = Parser(sequence)
+        program = parser.parse()
+        self.assertEqual(False, parser.has_error)
+        expected = 'Assignment(Identifier(tape), Array([Integer(0), Integer(0), Integer(0), Integer(0)]))'
+        self.assertEqual(expected, repr(program))
+
+    def test_array_literals(self):
+        test_cases = [
+            ("[1,2,3]", "Array([Integer(1), Integer(2), Integer(3)])"),
+            ("[]", "Array([])"),
+            ("[1.0, true, \"hello\"]", "Array([Float(1.0), Bool(True), String(hello)])"),
+            ("[[1,2],[3,4]]", "Array([Array([Integer(1), Integer(2)]), Array([Integer(3), Integer(4)])])")
+        ]
+
+        for source, expected in test_cases:
+            sequence = Lexer().tokenize(source)
+            parser = Parser(sequence)
+            program = parser.parse()
+            self.assertEqual(False, parser.has_error)
+            self.assertEqual(expected, repr(program.statements[0]))

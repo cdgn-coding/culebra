@@ -100,27 +100,6 @@ class Function:
             return rv.value
         return None
 
-##############################
-# Built-in function wrapper and definitions
-##############################
-
-class BuiltinFunction:
-    def __init__(self, func):
-        self.func = func
-
-    def call(self, interpreter, arguments):
-        return self.func(*arguments)
-
-def builtin_print(*args):
-    print(*args)
-    return None
-
-def builtin_input(prompt=""):
-    return input(prompt)
-
-def builtin_len(x):
-    return len(x)
-
 class Interpreter:
     def __init__(self):
         self.root_environment = Environment()
@@ -164,6 +143,10 @@ class Interpreter:
                 return self.evaluate_function_call(node, environment)
             elif isinstance(node, ast.ReturnStatement):
                 return self.evaluate_return(node, environment)
+            elif isinstance(node, ast.BracketAccess):
+                return self.evaluate_bracket_access(node, environment)
+            elif isinstance(node, ast.Array):
+                return self.evaluate_array(node, environment)
             else:
                 raise TypeError(f"Unexpected AST node type: {type(node)}")
         except Exception as e:
@@ -177,9 +160,18 @@ class Interpreter:
         return environment.get(node.value)
 
     def evaluate_assignment(self, node, environment):
-        # Evaluate the value and assign it to the variable in the current environment.
-        value = self.eval_node(node.value, environment)
-        environment.assign(node.identifier.value, value)
+        assert type(node.identifier) in [ast.Identifier, ast.BracketAccess]
+        if isinstance(node.identifier, ast.Identifier):
+            # Evaluate the value and assign it to the variable in the current environment.
+            value = self.eval_node(node.value, environment)
+            environment.assign(node.identifier.value, value)
+        else:
+            # Evaluate the value and assign it to the array in the current environment.
+            value = self.eval_node(node.value, environment)
+            container = self.eval_node(node.identifier.target, environment)
+            index = self.eval_node(node.identifier.index, environment)
+            environment.assign_bracket(container, index, value)
+
         return None
 
     def evaluate_literal(self, node, environment):
@@ -275,8 +267,59 @@ class Interpreter:
         value = self.eval_node(node.value, environment)
         raise ReturnValue(value)
 
+    def evaluate_bracket_access(self, node, environment):
+        target = self.eval_node(node.target, environment)
+        index = self.eval_node(node.index, environment)
+        
+        # Ensure index is an integer
+        if not isinstance(index, int):
+            raise TypeError(f"Index must be an integer, got {type(index)}")
+        
+        # Support both strings and arrays
+        if not isinstance(target, (str, list)):
+            raise TypeError(f"Bracket access only supports strings and arrays, got {type(target)}")
+        
+        # Check index bounds
+        if index < 0 or index >= len(target):
+            raise IndexError(f"Index {index} out of range for {type(target)} of length {len(target)}")
+        
+        return target[index]
+
+    def evaluate_array(self, node, environment):
+        # Evaluate each element in the array
+        return [self.eval_node(element, environment) for element in node.elements]
+
     def load_builtins(self):
         # Add built-in functions to the global environment.
         self.root_environment.assign("print", BuiltinFunction(builtin_print))
         self.root_environment.assign("input", BuiltinFunction(builtin_input))
         self.root_environment.assign("len", BuiltinFunction(builtin_len))
+        self.root_environment.assign("chr", BuiltinFunction(builtin_chr))
+        self.root_environment.assign("ord", BuiltinFunction(builtin_ord))
+
+##############################
+# Built-in function wrapper and definitions
+##############################
+class BuiltinFunction:
+    def __init__(self, func):
+        self.func = func
+
+    def call(self, interpreter, arguments):
+        return self.func(*arguments)
+
+def builtin_print(*args):
+    print(*args)
+    return None
+
+def builtin_input(prompt=""):
+    return input(prompt)
+
+def builtin_len(x):
+    return len(x)
+
+def builtin_chr(x):
+    return chr(x)
+
+def builtin_ord(x):
+    return ord(x)
+
