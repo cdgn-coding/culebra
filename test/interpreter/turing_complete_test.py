@@ -208,6 +208,8 @@ result = brainfuck(program)
         parser = Parser(sequence)
         program = parser.parse()
 
+        self.assertEqual(False, parser.has_error)
+
         interpreter = Interpreter()
         interpreter.evaluate(program)
 
