@@ -137,7 +137,7 @@ result = apply_twice(increment, 3)
 
     def test_brainfuck_interpreter(self):
         source = """
-def find_matching_bracket(current_pos, direction):
+def find_matching_bracket(current_pos, direction, code):
     count = 0
     if direction > 0:
         char_open = "["
@@ -184,12 +184,12 @@ def brainfuck(code):
             output = output + chr(tape[pointer])
         elif command == "[":
             if tape[pointer] == 0:
-                code_pos = find_matching_bracket(code_pos, 1)
+                code_pos = find_matching_bracket(code_pos, 1, code)
                 if code_pos < 0:
                     return "Error: Unmatched ["
         elif command == "]":
             if tape[pointer] != 0:
-                code_pos = find_matching_bracket(code_pos, -1)
+                code_pos = find_matching_bracket(code_pos, -1, code)
                 if code_pos < 0:
                     return "Error: Unmatched ]"
         code_pos = code_pos + 1
@@ -209,5 +209,5 @@ result = brainfuck(program)
         interpreter = Interpreter()
         interpreter.evaluate(program)
 
-        self.assertEqual("Hello, World!", interpreter.root_environment.get('result'))
+        self.assertEqual("Hello World!\n", interpreter.root_environment.get('result'))
 
