@@ -112,7 +112,6 @@ Explanation:
 ==================================
 Complete Grammar Definition
 ==================================
-
 Program         ::= Statement*
 
 Statement       ::= Assignment
@@ -136,6 +135,8 @@ ElementalExpr   ::= Identifier
                  | Literal
                  | "(" Expression ")"
                  | FunctionCall
+                 | BracketAccess
+                 | Array Literal
 BracketAccess   ::= (Identifier | BracketAccess) "[" Expression "]"
 Array Literal   ::= "[" Expression ("," Expression)* "]"
 
