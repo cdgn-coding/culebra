@@ -61,23 +61,23 @@ def process_parser_input(text: str) -> bool:
     parser = Parser(lexer.tokenize(text))
     program = parser.parse()
 
-    if parser.errors:
+    if parser.has_error:
         print("Parser Errors:")
-        for error in parser.errors:
-            print(f"\t{error}")
+        reporter = ErrorReporter(text)
+        reporter.report(parser.last_token, str(parser.last_error))
     else:
         print(program.pretty())
 
     return True
 
-interpreter = None
+_interpreter = None
 
 def get_interpreter():
-    global interpreter
-    if interpreter is None:
+    global _interpreter
+    if _interpreter is None:
         from culebra.interpreter.interpreter import Interpreter
-        interpreter = Interpreter()
-    return interpreter
+        _interpreter = Interpreter()
+    return _interpreter
 
 def process_interpreter_input(text: str) -> bool:
     """Process input in interpreter mode."""
@@ -92,10 +92,10 @@ def process_interpreter_input(text: str) -> bool:
     parser = Parser(lexer.tokenize(text))
     program = parser.parse()
 
-    if parser.errors:
+    if parser.has_error:
         print("Parser Errors:")
-        for error in parser.errors:
-            print(f"\t{error}")
+        reporter = ErrorReporter(text)
+        reporter.report(parser.last_token, str(parser.last_error))
         return True
 
     interpreter = get_interpreter()
