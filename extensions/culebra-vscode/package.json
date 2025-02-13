@@ -1,0 +1,25 @@
+{
+  "name": "culebra-syntax",
+  "displayName": "Culebra Syntax Support",
+  "description": "Gives syntax support for culebra language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "culebra",
+      "aliases": ["culebra", "culebra"],
+      "extensions": [".culebra"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "culebra",
+      "scopeName": "source.culebra",
+      "path": "./syntaxes/culebra.tmLanguage.json"
+    }]
+  }
+}
