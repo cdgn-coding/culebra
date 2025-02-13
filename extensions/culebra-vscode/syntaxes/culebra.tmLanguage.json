@@ -1,0 +1,63 @@
+{
+    "scopeName": "source.culebra",
+    "patterns": [
+      { "include": "#comments" },
+      { "include": "#keywords" },
+      { "include": "#strings" },
+      { "include": "#numbers" },
+      { "include": "#operators" },
+      { "include": "#functions" }
+    ],
+    "repository": {
+      "comments": {
+        "match": "#.*$",
+        "name": "comment.line.number-sign.culebra"
+      },
+      "keywords": {
+        "patterns": [{
+          "match": "\\b(if|elif|else|while|for|def|return|true|false|and|or|not)\\b",
+          "name": "keyword.control.culebra"
+        }]
+      },
+      "strings": {
+        "patterns": [
+          {
+            "match": "\"\"\"[^\"]*\"\"\"",
+            "name": "string.quoted.triple.culebra"
+          },
+          {
+            "match": "\"[^\"]*\"",
+            "name": "string.quoted.double.culebra"
+          }
+        ]
+      },
+      "numbers": {
+        "patterns": [
+          {
+            "match": "\\b\\d+\\.\\d+\\b",
+            "name": "constant.numeric.float.culebra"
+          },
+          {
+            "match": "\\b\\d+\\b",
+            "name": "constant.numeric.integer.culebra"
+          }
+        ]
+      },
+      "operators": {
+        "patterns": [
+          {
+            "match": "[+\\-*/=<>!]=|[+\\-*/=<>]",
+            "name": "keyword.operator.culebra"
+          }
+        ]
+      },
+      "functions": {
+        "patterns": [
+          {
+            "match": "\\b(len|print|chr|ord)\\b",
+            "name": "support.function.builtin.culebra"
+          }
+        ]
+      }
+    }
+  }

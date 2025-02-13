@@ -1,0 +1,31 @@
+<idea-plugin>
+    <id>com.culebra</id>
+    <name>Culebra Language</name>
+    <vendor>Culebra</vendor>
+    <description><![CDATA[
+        Support for the Culebra programming language.<br>
+        Features:
+        <ul>
+            <li>Syntax highlighting</li>
+            <li>File type recognition (.cul files)</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- File type -->
+        <fileType
+                name="Culebra"
+                implementationClass="com.culebra.CulebraFileType"
+                fieldName="INSTANCE"
+                language="Culebra"
+                extensions="culebra"/>
+
+        <!-- Syntax highlighter -->
+        <lang.syntaxHighlighterFactory
+                language="Culebra"
+                implementationClass="com.culebra.CulebraSyntaxHighlighterFactory"/>
+    </extensions>
+</idea-plugin>
