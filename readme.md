@@ -55,8 +55,8 @@ Este lenguaje minimalista inspirado en Python y Go está diseñado para ser senc
   - [x] Llamadas a funciones
   - [x] Sentencias `return`
 
-- [ ] Estructuras de Datos Complejas
-  - [ ] Arrays (`[...]`)
+- [x] Estructuras de Datos Complejas
+  - [x] Arrays (`[...]`)
   - [ ] Mapas (`{clave: valor, ...}`)
   - [ ] Conjuntos (`{elemento, ...}`)
 
@@ -64,14 +64,14 @@ Este lenguaje minimalista inspirado en Python y Go está diseñado para ser senc
   - [x] Manejo de bloques (INDENT/DEDENT)
   - [ ] Valor nulo u Option
 
-- [ ] Manejo de Errores
-  - [ ] Reporte de errores en línea durante parseo
-  - [ ] Reporte de errores en linea durante interpretación
-  - [ ] Reporte de errores en linea en chequeo de tipos
+- [x] Manejo de Errores
+  - [x] Reporte de errores en línea durante parseo
+  - [x] Reporte de errores en linea durante interpretación
+  - [x] Reporte de errores en linea en chequeo de tipos (Built-in de Python)
 
 
 - Interprete
-  - [ ] Tree-walk interpreter
+  - [x] Tree-walk interpreter
   - [ ] LLVM Just-in-time compiler
   - [ ] LLVM AOT compiler
 
