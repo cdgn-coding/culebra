@@ -5,6 +5,8 @@ from culebra.interpreter.interpreter import Interpreter
 from culebra.parser import Parser
 from culebra.lexer import Lexer
 from culebra.error_reporter import ErrorReporter
+from culebra.token import TokenType
+
 
 def main():
     parser = argparse.ArgumentParser(description='Culebra interpreter or REPL')
@@ -47,6 +49,12 @@ def main():
             # Create lexer and generate tokens
             lexer = Lexer()
             tokens = lexer.tokenize(source)
+
+            if args.lexer:
+                for token in tokens:
+                    if token.type != TokenType.EOF:
+                        print(token)
+                return
 
             # Create parser (renamed local variable to avoid shadowing the argparse parser)
             ast_parser = Parser(tokens)
